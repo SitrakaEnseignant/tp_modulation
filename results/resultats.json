@@ -73,6 +73,27 @@
         "simulation": "1,56 kHz",
         "statut": "INFO",
         "commentaire": "au-delà, l'écrêtage en diagonale apparaît (m = 0,714, RC = 100 µs)"
+      },
+      {
+        "nom": "[ngspice] Détecteur de la maquette (OA-79, 10 kΩ, 0,01 µF), message 10 kHz",
+        "video": "message montré déformé ?",
+        "simulation": "SINAD 10,9 dB",
+        "statut": "ÉCART",
+        "commentaire": "même conclusion que le modèle Python : écrêtage en diagonale à 10 kHz"
+      },
+      {
+        "nom": "[ngspice] Même détecteur, message 1 kHz",
+        "video": "—",
+        "simulation": "SINAD 43,8 dB",
+        "statut": "INFO",
+        "commentaire": ""
+      },
+      {
+        "nom": "[ngspice] Détecteur avec 1,5 nF, message 10 kHz",
+        "video": "—",
+        "simulation": "SINAD 40,8 dB",
+        "statut": "INFO",
+        "commentaire": ""
       }
     ],
     "hypotheses": [
@@ -82,13 +103,29 @@
     ],
     "figures": [
       {
+        "fichier": "figures/tp01_detecteur_ngspice.png",
+        "legende": "Écrêtage en diagonale simulé dans ngspice"
+      },
+      {
         "fichier": "figures/tp01_am.png",
         "legende": "Signal AM, spectre et détecteur d'enveloppe simulés"
       }
     ],
     "tableaux": [],
+    "doutes": [
+      {
+        "doute": "Le détecteur de la maquette restitue-t-il le message de 10 kHz utilisé dans la vidéo ?",
+        "statut": "levé",
+        "explication": "Non : ngspice (diode germanium SPICE) donne un SINAD de 10,9 dB à 10 kHz contre 43,8 dB à 1 kHz. La constante de temps 10 kΩ × 0,01 µF = 100 µs est faite pour un message audio de 1 à 2 kHz."
+      },
+      {
+        "doute": "Circuit interne de l'oscillateur de porteuse (≈ 133 kHz)",
+        "statut": "reste",
+        "explication": "Il n'est pas imprimé sur la maquette : la porteuse est mesurée, pas simulée."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=YkTwZO9ub90",
-    "duree_s": 0.4
+    "duree_s": 1.8
   },
   {
     "tp": 2,
@@ -184,6 +221,23 @@
       }
     ],
     "tableaux": [],
+    "doutes": [
+      {
+        "doute": "fmin écrit 55 kHz sur la feuille",
+        "statut": "levé",
+        "explication": "1/38 µs = 26,3 kHz : erreur de recopie."
+      },
+      {
+        "doute": "Lecture de 3,8 div pour fmin",
+        "statut": "reste",
+        "explication": "Un VCO symétrique donnerait ≈ 2,8 div ; le circuit interne de la maquette n'étant pas publié, seule une nouvelle mesure peut trancher."
+      },
+      {
+        "doute": "Valeurs dites à l'oral différentes du tableau final",
+        "statut": "reste",
+        "explication": "La transcription automatique n'est pas fiable ; le tableau final reste la référence."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=D5Se6hQdWQA",
     "duree_s": 0.3
   },
@@ -353,8 +407,9 @@
         ]
       ]
     ],
+    "doutes": [],
     "lien": "https://www.youtube.com/watch?v=vzdANFkMhSQ",
-    "duree_s": 0.4
+    "duree_s": 0.3
   },
   {
     "tp": 4,
@@ -430,6 +485,7 @@
         ]
       ]
     ],
+    "doutes": [],
     "lien": "https://www.youtube.com/watch?v=MSSf-RjRAB4",
     "duree_s": 0.2
   },
@@ -511,6 +567,7 @@
         ]
       ]
     ],
+    "doutes": [],
     "lien": "https://www.youtube.com/watch?v=MGXgkWwaYSs",
     "duree_s": 0.1
   },
@@ -619,6 +676,18 @@
         ]
       ]
     ],
+    "doutes": [
+      {
+        "doute": "Unité « secs » de la colonne largeur",
+        "statut": "réduit",
+        "explication": "Des largeurs de 0,2 s sont impossibles avec l'horloge de la maquette : ce sont très probablement des ms."
+      },
+      {
+        "doute": "Fréquence du message pendant la mesure du déphasage",
+        "statut": "reste",
+        "explication": "500 Hz ou 1 kHz : les deux cas sont calculés, le filtre correspondant est le même (≈ 1,6 kHz à l'ordre 2)."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=Q6VduGGqPRE",
     "duree_s": 0.1
   },
@@ -644,14 +713,14 @@
       {
         "nom": "Sensibilité du VCO",
         "video": "tableau V / f à compléter",
-        "simulation": "K = f0/(0,2·Vs) = 12,5 kHz/V",
+        "simulation": "K = f0/(0,2·Vs) = 15 kHz/V",
         "statut": "INFO",
         "commentaire": "la fréquence baisse quand la tension de la broche 8 monte vers V+"
       },
       {
         "nom": "Exemple : m(t) = 0,5 V crête à 1 kHz sur la broche 8",
         "video": "fmax, fmin, Δf, β à calculer",
-        "simulation": "fmax = 36,2 kHz ; fmin = 23,8 kHz ; Δf = 6,24 kHz ; β = 6,24",
+        "simulation": "fmax = 37,5 kHz ; fmin = 22,5 kHz ; Δf = 7,49 kHz ; β = 7,49",
         "statut": "INFO",
         "commentaire": "valeurs prédites pour remplir le tableau ; Δf = K·Am"
       },
@@ -661,14 +730,39 @@
         "simulation": "6,6 kΩ n'est pas une valeur normalisée",
         "statut": "À VÉRIFIER",
         "commentaire": "la série E12 contient 6,8 kΩ ; cette résistance règle la polarisation FM, pas f0 (écart < 3 %)"
+      },
+      {
+        "nom": "[ngspice] Fréquence libre (RA = RB = 10 kΩ, C = 1 nF, 10 V)",
+        "video": "≈ 30 kHz (formule)",
+        "simulation": "29,99 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "modèle comportemental construit d'après le schéma interne de la fiche technique"
+      },
+      {
+        "nom": "[ngspice] 6,6 kΩ ou 6,8 kΩ entre les broches 7 et 8 (m(t) = 0,5 V crête)",
+        "video": "valeur lue douteuse",
+        "simulation": "6,6 kΩ : 22,5 kHz à 37,5 kHz ; 6,8 kΩ : 22,5 kHz à 37,5 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "le générateur impose la tension de la broche 8 à travers 10 µF : la résistance ne change pas la fréquence"
+      },
+      {
+        "nom": "[ngspice] Message de la vidéo : 4 Vpp à 500 Hz sur la broche 8",
+        "video": "fmax, fmin à mesurer",
+        "simulation": "fréquence de 2,32 kHz à 60,2 kHz",
+        "statut": "INFO",
+        "commentaire": "Au repos V+ − V8 = 2 V ; avec 2 V crête, cet écart varie de 0 à 4 V : la fréquence descend presque à zéro sur une alternance et double sur l'autre. C'est une modulation très forte et non linéaire."
       }
     ],
     "hypotheses": [
       "RA, RB et C réels non lisibles dans la vidéo : RA = RB = 10 kΩ, C = 1 nF supposés.",
-      "Alimentation 12 V ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
+      "Alimentation 10 V (schéma) ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
       "VCO idéal et linéaire ; la fiche technique annonce une linéarité de l'ordre de 0,5 % sur une large plage."
     ],
     "figures": [
+      {
+        "fichier": "figures/tp07_icl8038_ngspice.png",
+        "legende": "Fréquence instantanée de l'ICL8038 simulé dans ngspice"
+      },
       {
         "fichier": "figures/tp07_fm.png",
         "legende": "ICL8038 utilisé comme VCO"
@@ -676,7 +770,7 @@
     ],
     "tableaux": [
       [
-        "Caractéristique du VCO prédite : f en fonction de la variation de V(broche 8) (V+ = 12 V)",
+        "Caractéristique du VCO prédite : f en fonction de la variation de V(broche 8) (V+ = 10 V)",
         [
           "ΔV broche 8 (V)",
           "f"
@@ -684,11 +778,11 @@
         [
           [
             "-1",
-            "42,5 kHz"
+            "45 kHz"
           ],
           [
             "-0,5",
-            "36,2 kHz"
+            "37,5 kHz"
           ],
           [
             "0",
@@ -696,17 +790,34 @@
           ],
           [
             "0,5",
-            "23,8 kHz"
+            "22,5 kHz"
           ],
           [
             "1",
-            "17,5 kHz"
+            "15 kHz"
           ]
         ]
       ]
     ],
+    "doutes": [
+      {
+        "doute": "Résistance entre les broches 7 et 8 : 6,6 kΩ ou 6,8 kΩ ?",
+        "statut": "levé",
+        "explication": "La valeur ne change pas la fréquence : la broche 8 est imposée par le générateur à travers 10 µF. 6,8 kΩ (valeur normalisée) est le plus probable, sans effet sur les mesures."
+      },
+      {
+        "doute": "Valeurs de RA et RB (illisibles)",
+        "statut": "reste",
+        "explication": "f0 est inversement proportionnelle à RA et RB : la simulation ne peut pas les retrouver sans une mesure de f0."
+      },
+      {
+        "doute": "Amplitude du message 4 Vpp",
+        "statut": "réduit",
+        "explication": "Avec 10 V d'alimentation, 4 Vpp sur la broche 8 surmodule le VCO (fréquence proche de zéro au sommet). Pour une FM linéaire, il faut quelques centaines de mV."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=eaoYraDUfKk",
-    "duree_s": 0.2
+    "duree_s": 7.0
   },
   {
     "tp": 8,
@@ -752,6 +863,13 @@
       }
     ],
     "tableaux": [],
+    "doutes": [
+      {
+        "doute": "« Seule l'alternance positive apparaît »",
+        "statut": "reste",
+        "explication": "Une horloge 0/1 ne suffit pas à l'expliquer ; cela dépend du montage interne de la maquette (non publié)."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=eeunlmRM_LA",
     "duree_s": 0.2
   },
@@ -791,9 +909,9 @@
       {
         "nom": "Message récupéré à la sortie (broche 7)",
         "video": "sinus 1 kHz récupéré à l'oscilloscope",
-        "simulation": "165 mV crête ; SINAD -5,61 dB brut, 24,7 dB après un filtre passe-bas de 3 kHz",
+        "simulation": "290 mV crête ; SINAD 24,6 dB brut, 30,2 dB après un filtre passe-bas de 3 kHz",
         "statut": "CONFIRMÉ",
-        "commentaire": "amplitude attendue Δf/Ko = 161 mV. La sortie brute porte une forte ondulation à 2·f0 ≈ 18,8 kHz qu'un petit filtre passe-bas après la broche 7 enlève."
+        "commentaire": "amplitude attendue Δf/Ko = 321 mV. La sortie brute porte une forte ondulation à 2·f0 ≈ 18,8 kHz qu'un petit filtre passe-bas après la broche 7 enlève."
       },
       {
         "nom": "Branchement de C1",
@@ -801,22 +919,93 @@
         "simulation": "fiche technique : C1 entre broche 9 et −V (broche 1)",
         "statut": "À VÉRIFIER",
         "commentaire": "le circuit fonctionne aussi avec C1 à la masse, mais f0 peut s'écarter un peu de la formule"
+      },
+      {
+        "nom": "[ngspice] Fréquence libre du VCO, C1 relié à la masse / à −12 V",
+        "video": "9,4 kHz",
+        "simulation": "9,369 kHz / 9,39 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "avec des alimentations stables, la masse et −12 V sont deux points fixes : le condensateur voit la même variation"
+      },
+      {
+        "nom": "[ngspice] Message récupéré sur la broche 7 (Δf = 1 kHz)",
+        "video": "sinus 1 kHz récupéré",
+        "simulation": "289 mV crête ; SINAD 26,5 dB",
+        "statut": "CONFIRMÉ",
+        "commentaire": "amplitude attendue Δf/Ko = 321 mV (Ko = 3,11 kHz/V sous ±12 V)"
+      },
+      {
+        "nom": "[ngspice] Plage de capture simulée",
+        "video": "estimation √(2π·fL/τ)/2π = ±957 Hz",
+        "simulation": "accrochage jusqu'à ±1 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "la plage de verrouillage (boucle déjà accrochée) est plus large : ±3,13 kHz d'après la fiche technique. Avec C2 = 150 nF, la porteuse doit être réglée à moins d'environ 1 kHz de f0 pour que la boucle s'accroche."
       }
     ],
     "hypotheses": [
       "Excursion de fréquence du générateur non lue dans la vidéo : Δf = 1 kHz supposé.",
-      "Kd = 0,68 V/rad et Ko = 6600 Hz/V à 10 kHz (fiche technique) ; résistance interne broche 7 ≈ 3,6 kΩ.",
-      "Condensateur de filtre de boucle C2 = 10 nF supposé."
+      "Ko = 50·f0/Vc (fiche technique) ; comparateur de phase ±1 V ; résistance interne broche 7 ≈ 3,6 kΩ ; C2 = 150 nF (schéma)."
     ],
     "figures": [
+      {
+        "fichier": "figures/tp09_lm565_ngspice.png",
+        "legende": "Message de 1 kHz récupéré par le LM565 simulé dans ngspice"
+      },
       {
         "fichier": "figures/tp09_pll.png",
         "legende": "Sortie du LM565 simulé (message 1 kHz)"
       }
     ],
-    "tableaux": [],
+    "tableaux": [
+      [
+        "ngspice : la boucle s'accroche-t-elle sur une porteuse pure décalée de f0 (départ décroché) ?",
+        [
+          "Écart à f0",
+          "Boucle"
+        ],
+        [
+          [
+            "± 500 Hz",
+            "accrochée"
+          ],
+          [
+            "± 1 kHz",
+            "accrochée"
+          ],
+          [
+            "± 1,5 kHz",
+            "non accrochée"
+          ],
+          [
+            "± 2 kHz",
+            "non accrochée"
+          ],
+          [
+            "± 3 kHz",
+            "non accrochée"
+          ]
+        ]
+      ]
+    ],
+    "doutes": [
+      {
+        "doute": "C1 relié à la masse (vidéo) ou à −12 V (fiche technique) ?",
+        "statut": "réduit",
+        "explication": "Avec des alimentations stables, ngspice donne la même fréquence (9,37 kHz et 9,39 kHz). La fiche technique préfère −V pour que le condensateur suive les variations de l'alimentation ; le modèle comportemental ne peut pas reproduire cet effet de second ordre."
+      },
+      {
+        "doute": "Alimentation ±4 V (oral) ou ±12 V (écran) ?",
+        "statut": "levé",
+        "explication": "±4 V est hors de la plage du LM565 (±5 à ±12 V) ; ±12 V donne une plage de verrouillage de ±3,1 kHz autour de 9,4 kHz, compatible avec la démonstration."
+      },
+      {
+        "doute": "Excursion de fréquence du générateur",
+        "statut": "reste",
+        "explication": "Non lisible dans la vidéo : la sortie démodulée lui est proportionnelle (Δf/Ko)."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=3HIn2Pt3ySg",
-    "duree_s": 0.1
+    "duree_s": 18.4
   },
   {
     "tp": 10,
@@ -878,6 +1067,41 @@
         "simulation": "Δf asymétrique : la charge ralentit fortement quand Vcv approche Vcc − 0,6 V",
         "statut": "INFO",
         "commentaire": "avec 1,5 V crête autour de 2,5 V, la broche 5 monte à 4 V : le 555 est très non linéaire ; un message plus faible serait plus fidèle"
+      },
+      {
+        "nom": "[ngspice] Fréquence sans message (C1 = 0,1 µF)",
+        "video": "≈ 11 kHz",
+        "simulation": "5,49 kHz",
+        "statut": "ÉCART",
+        "commentaire": "même résultat que la simulation Python (5,4 kHz) avec un autre simulateur et une vraie diode SPICE"
+      },
+      {
+        "nom": "[ngspice] Rapport cyclique",
+        "video": "« charge et décharge égales »",
+        "simulation": "40,8 %",
+        "statut": "ÉCART",
+        "commentaire": "Python : 39,3 %"
+      },
+      {
+        "nom": "[ngspice] Niveau haut de la sortie",
+        "video": "≈ 5,4 V",
+        "simulation": "3,3 V",
+        "statut": "ÉCART",
+        "commentaire": "un NE555 bipolaire sous 5 V ne peut pas sortir 5,4 V"
+      },
+      {
+        "nom": "[ngspice] Fréquence avec C1 = 47 nF",
+        "video": "≈ 11 kHz",
+        "simulation": "11,7 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "[ngspice] FM avec message 200 Hz, 3 Vpp (C1 = 0,1 µF)",
+        "video": "fmin / fmax à mesurer",
+        "simulation": "fmin = 2,96 kHz ; fmax = 8,17 kHz ; Δf = 2,6 kHz",
+        "statut": "INFO",
+        "commentaire": ""
       }
     ],
     "hypotheses": [
@@ -885,6 +1109,10 @@
       "Diode 1N4007 : Is = 7 nA, n = 1,8 ; sortie du générateur idéale."
     ],
     "figures": [
+      {
+        "fichier": "figures/tp10_555_ngspice.png",
+        "legende": "Simulation ngspice du 555 avec les valeurs du schéma"
+      },
       {
         "fichier": "figures/tp10_555.png",
         "legende": "Astable 555 et fréquence instantanée modulée"
@@ -934,13 +1162,30 @@
         ]
       ]
     ],
+    "doutes": [
+      {
+        "doute": "Valeur de C1 : 0,1 µF lu, mais 11 kHz mesurés",
+        "statut": "réduit",
+        "explication": "Deux simulateurs (Python et ngspice) donnent 5,49 kHz avec 0,1 µF et 11,7 kHz avec 47 nF. Avec R1 = R2 = 1,5 kΩ, le condensateur réel est donc ≈ 47 nF (ou les résistances sont plus petites). Seule une photo nette du montage peut trancher entre les deux."
+      },
+      {
+        "doute": "« La diode rend charge et décharge égales »",
+        "statut": "levé",
+        "explication": "Faux avec R3 = 10 kΩ sur la broche 5 : rapport cyclique ≈ 40,8 % (seuils 2,5 V et 1,25 V)."
+      },
+      {
+        "doute": "Amplitude de sortie 5,4 V sous 5 V",
+        "statut": "réduit",
+        "explication": "Impossible pour un NE555 bipolaire (≈ 3,3 V) : 555 CMOS, sonde mal compensée ou lecture crête-à-crête avec dépassement."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=xSqwbJl5yzU",
-    "duree_s": 0.8
+    "duree_s": 3.3
   },
   {
     "tp": 11,
-    "titre": "AM à transistor BC107BP + détecteur d'enveloppe (SPICE)",
-    "methode": "Simulation SPICE (ngspice) du schéma de la vidéo avec des modèles génériques BC107B et 1N4001.",
+    "titre": "AM à transistor BC107BP + détecteur d'enveloppe (ngspice)",
+    "methode": "Simulation ngspice du schéma de la vidéo (modèles génériques BC107B et 1N4001).",
     "checks": [
       {
         "nom": "Accord du circuit L1 // C1",
@@ -961,7 +1206,7 @@
         "video": "μ ≈ 0,03 (tensions absolues)",
         "simulation": "μ = (11,8 − 11)/(11,8 + 11 − 2 × 8,3) = 0,129",
         "statut": "À VÉRIFIER",
-        "commentaire": "Le collecteur est polarisé à Vcc par L1. Si l'oscilloscope est en couplage continu (DC), les crêtes lues contiennent ces 8,3 V : la formule (Emax − Emin)/(Emax + Emin) sous-estime alors μ d'un facteur ≈ 4. Il faut mesurer en couplage alternatif (AC) ou retirer la composante continue."
+        "commentaire": "Le collecteur est polarisé à Vcc par L1. En couplage continu (DC) à l'oscilloscope, les crêtes lues contiennent ces 8,3 V : la formule (Emax − Emin)/(Emax + Emin) sous-estime alors μ d'un facteur ≈ 4."
       },
       {
         "nom": "Détecteur : 1/fc ≪ R5·C2 ≪ 1/fm",
@@ -971,62 +1216,54 @@
         "commentaire": "condition respectée (5 périodes de porteuse, 1/4 de période du message)"
       },
       {
-        "nom": "Emax / Emin au collecteur, modulateur seul (Vcc = 8,3 V)",
+        "nom": "[ngspice] Emax / Emin au collecteur, modulateur seul (8,3 V)",
         "video": "≈ 11,8 V / ≈ 11 V",
         "simulation": "10,9 V / 10,3 V",
         "statut": "CONFIRMÉ",
-        "commentaire": "crêtes de chaque cycle de porteuse sur 10 ms ; dépend du transistor et de la résistance de L1"
+        "commentaire": "crêtes de chaque cycle de porteuse sur 10 ms"
       },
       {
-        "nom": "Taux de modulation μ (formule de la vidéo, tensions absolues)",
+        "nom": "[ngspice] μ avec la formule de la vidéo (tensions absolues)",
         "video": "≈ 0,03",
         "simulation": "μ = 0,0278",
         "statut": "CONFIRMÉ",
-        "commentaire": "la simulation retrouve la valeur de la vidéo avec un BC107 : le transistor de remplacement n'est pas nécessaire pour l'expliquer ; la valeur faible vient surtout de la tension continue (ligne suivante)"
+        "commentaire": "la simulation retrouve la valeur de la vidéo avec un BC107 ordinaire"
       },
       {
-        "nom": "μ calculé sur la seule partie alternative",
-        "video": "0,129 en corrigeant les valeurs de la vidéo",
+        "nom": "[ngspice] μ sur la seule partie alternative",
+        "video": "0,129 en corrigeant la vidéo",
         "simulation": "μ = 0,129",
         "statut": "CONFIRMÉ",
-        "commentaire": "en retirant la tension continue du collecteur (8,31 V) : c'est la définition correcte de μ. Le vrai taux de modulation est ≈ 13 %, pas 3 %."
+        "commentaire": "tension continue du collecteur : 8,31 V. Le vrai taux de modulation est ≈ 13 %, pas 3 %."
       },
       {
-        "nom": "Même modulateur sous 12 V (valeur du schéma)",
+        "nom": "[ngspice] Même modulateur sous 12 V (valeur du schéma)",
         "video": "—",
-        "simulation": "Emax = 14,6 V ; Emin = 12,9 V ; μ = 0,06",
+        "simulation": "Emax = 14,6 V ; Emin = 12,9 V ; μ (partie alternative) = 0,468",
         "statut": "INFO",
         "commentaire": ""
       },
       {
-        "nom": "Démodulateur du schéma branché sur la sortie AM",
+        "nom": "[ngspice] Démodulateur du schéma branché sur la sortie AM",
         "video": "démodulateur décrit sur la feuille (circuit séparé)",
-        "simulation": "message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV)",
+        "simulation": "message 43,9 mV crête ; enveloppe au collecteur 46,5 mV crête (à vide : 294 mV)",
         "statut": "ÉCART",
-        "commentaire": "le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes)"
-      },
-      {
-        "nom": "Conclusion sur le démodulateur",
-        "video": "—",
-        "simulation": "toutes les variantes chargent le circuit accordé",
-        "statut": "INFO",
-        "commentaire": "Le détecteur ne prend du courant qu'aux crêtes et écrase la tension du circuit accordé. Il faut un étage tampon (émetteur suiveur) entre la sortie AM et le détecteur, ou tester le démodulateur séparément avec un générateur AM, comme le suggère la feuille de la vidéo."
+        "commentaire": "Le détecteur ne prend du courant qu'aux crêtes et écrase la tension du circuit accordé, même avec R5 = 10 kΩ. Il faut un étage tampon (émetteur suiveur) entre la sortie AM et le détecteur."
       }
     ],
     "hypotheses": [
-      "Modèles génériques BC107B et 1N4001 : le transistor réellement utilisé dans la vidéo n'est pas connu.",
-      "Résistance série de L1 : 50 Ω (non indiquée).",
-      "μ calculé comme dans la vidéo, avec les tensions absolues des crêtes : (Emax − Emin)/(Emax + Emin)."
+      "Modèles génériques BC107B et 1N4001 ; résistance série de L1 : 50 Ω (non indiquée).",
+      "μ calculé comme dans la vidéo avec les crêtes absolues, puis sur la seule partie alternative."
     ],
     "figures": [
       {
-        "fichier": "figures/tp11_am_spice.png",
+        "fichier": "figures/tp11_am_ngspice.png",
         "legende": "Modulateur AM à BC107 simulé avec ngspice"
       }
     ],
     "tableaux": [
       [
-        "Démodulateur branché sur la sortie AM (collecteur à vide : 10,9 V / 10,3 V, variation d'enveloppe 295 mV crête)",
+        "Démodulateur branché sur la sortie AM (collecteur à vide : 10,9 V / 10,3 V, variation d'enveloppe 294 mV crête)",
         [
           "Détecteur",
           "Emax / Emin au collecteur",
@@ -1035,28 +1272,44 @@
         ],
         [
           [
-            "schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF",
+            "schéma : R5 = 500 Ω, C2 = 1 µF",
             "7,73 V / 7,63 V",
             "6,93 V",
             "43,9 mV"
           ],
           [
-            "1N4001, R5 = 10 kΩ, C2 = 47 nF",
+            "R5 = 10 kΩ, C2 = 47 nF",
             "8,85 V / 8,71 V",
             "7,74 V",
-            "36,1 mV"
-          ],
-          [
-            "1N4148, R5 = 10 kΩ, C2 = 47 nF",
-            "8,82 V / 8,71 V",
-            "7,75 V",
-            "32,3 mV"
+            "36,2 mV"
           ]
         ]
       ]
     ],
+    "doutes": [
+      {
+        "doute": "Le μ très faible vient-il du transistor de remplacement ?",
+        "statut": "levé",
+        "explication": "Non. Avec un BC107 ordinaire, ngspice donne aussi μ ≈ 0,0278 avec la formule de la vidéo. La valeur faible vient des 8,3 V continus inclus dans Emax et Emin ; sans eux μ ≈ 0,129."
+      },
+      {
+        "doute": "μ = 0,029 ou 0,035 ?",
+        "statut": "levé",
+        "explication": "Les deux sont des calculs sur des tensions absolues. La grandeur physique est μ ≈ 0,13 (partie alternative)."
+      },
+      {
+        "doute": "Le démodulateur peut-il être branché directement sur la sortie AM ?",
+        "statut": "levé",
+        "explication": "Non : il charge le circuit accordé et la modulation s'effondre ; un étage tampon est nécessaire."
+      },
+      {
+        "doute": "Référence exacte du transistor « two and triple five »",
+        "statut": "reste",
+        "explication": "La simulation ne peut pas identifier le composant ; elle montre seulement qu'il ne change pas la conclusion."
+      }
+    ],
     "lien": "https://www.youtube.com/watch?v=51hQ_KS0t9I",
-    "duree_s": 2.2
+    "duree_s": 2.0
   },
   {
     "tp": 12,
@@ -1131,8 +1384,9 @@
         ]
       ]
     ],
+    "doutes": [],
     "lien": "https://www.youtube.com/watch?v=tbTM0nnaiV4",
-    "duree_s": 0.4
+    "duree_s": 0.3
   },
   {
     "tp": 13,
@@ -1220,6 +1474,7 @@
         ]
       ]
     ],
+    "doutes": [],
     "lien": "https://www.youtube.com/watch?v=OZSDbqnP3Wo",
     "duree_s": 0.4
   }
