@@ -19,11 +19,11 @@ Légende : ✅ confirmé · ❌ écart (la simulation contredit la vidéo) · �
 | TP08 | PAM – maquette Excel Technologies (1 kHz / 8 kHz) | 1 | 0 | 1 | 2 |
 | TP09 | Démodulation FM par boucle à verrouillage de phase LM565 | 4 | 1 | 1 | 0 |
 | TP10 | FM avec un NE555 (astable, message sur la broche 5) | 1 | 2 | 2 | 3 |
-| TP11 | AM à transistor BC107BP + détecteur d'enveloppe (SPICE) | 2 | 2 | 1 | 2 |
+| TP11 | AM à transistor BC107BP + détecteur d'enveloppe (SPICE) | 3 | 3 | 1 | 3 |
 | TP12 | PAM et démodulation – Scientech ST2110 (8 / 16 / 32 / 64 kHz) | 2 | 0 | 0 | 1 |
 | TP13 | PAM avancé – Vinytics CT-PAM ADV (fs 2 à 64 kHz, filtres d'ordre 2 et 4) | 2 | 0 | 0 | 2 |
 
-**Total : 35 confirmés, 9 écarts, 7 à vérifier, 23 valeurs prédites.**
+**Total : 36 confirmés, 10 écarts, 7 à vérifier, 24 valeurs prédites.**
 
 ## TP01 – AM – maquette Omega ETB-96 (2 transistors BF-195, détecteur OA-79)
 
@@ -340,11 +340,14 @@ Méthode : Simulation SPICE (ngspice) du schéma de la vidéo avec des modèles 
 |---|---|---|---|---|
 | ❌ | Accord du circuit L1 // C1 | porteuse 10 kHz | f0 = 1/(2π√(LC)) = 7,12 kHz | le circuit accordé est réglé -29 % sous la porteuse : le gain à 10 kHz est réduit. Il faudrait C1 ≈ 5,1 nF (ou L1 ≈ 25 mH) pour accorder sur 10 kHz. |
 | ❌ | Calcul de μ avec Emax = 11,8 V et Emin = 11 V | μ = 0,029 annoncé | μ = 0,0351 | 0,029 venait d'une mesure précédente (Vmax = 12,3 V) ; avec les valeurs affichées μ ≈ 0,035 |
+| ⚠️ | μ en retirant la tension continue du collecteur (8,3 V) | μ ≈ 0,03 (tensions absolues) | μ = (11,8 − 11)/(11,8 + 11 − 2 × 8,3) = 0,129 | Le collecteur est polarisé à Vcc par L1. Si l'oscilloscope est en couplage continu (DC), les crêtes lues contiennent ces 8,3 V : la formule (Emax − Emin)/(Emax + Emin) sous-estime alors μ d'un facteur ≈ 4. Il faut mesurer en couplage alternatif (AC) ou retirer la composante continue. |
 | ✅ | Détecteur : 1/fc ≪ R5·C2 ≪ 1/fm | 1/fc = 100 µs, 1/fm = 2 ms | R5·C2 = 500 µs | condition respectée (5 périodes de porteuse, 1/4 de période du message) |
-| ⚠️ | Emax / Emin au collecteur (Vcc = 8,3 V) | ≈ 11,8 V / ≈ 11 V | 7,73 V / 7,63 V | crêtes de chaque cycle de porteuse sur 10 ms |
-| ✅ | Taux de modulation μ (même formule que la vidéo) | ≈ 0,03 | μ = 0,00605 | un μ très faible confirme que ce montage module peu ; la vidéo l'attribue au transistor de remplacement, la simulation montre que le schéma lui-même donne déjà un μ faible avec un BC107 |
-| ℹ️ | Message récupéré après le détecteur | sinus de 500 Hz observé | 43,9 mV crête à 500 Hz |  |
-| ℹ️ | Même montage sous 12 V (valeur du schéma) | — | Emax = 11 V ; Emin = 10,9 V ; μ = 0,00391 |  |
+| ✅ | Emax / Emin au collecteur, modulateur seul (Vcc = 8,3 V) | ≈ 11,8 V / ≈ 11 V | 10,9 V / 10,3 V | crêtes de chaque cycle de porteuse sur 10 ms ; dépend du transistor et de la résistance de L1 |
+| ✅ | Taux de modulation μ (formule de la vidéo, tensions absolues) | ≈ 0,03 | μ = 0,0278 | même ordre de grandeur que la vidéo : le montage module très peu |
+| ℹ️ | μ calculé sur la seule partie alternative | — | μ = 0,129 | en retirant la tension continue du collecteur (8,31 V) ; c'est la définition correcte de μ |
+| ℹ️ | Même modulateur sous 12 V (valeur du schéma) | — | Emax = 14,6 V ; Emin = 12,9 V ; μ = 0,06 |  |
+| ❌ | Démodulateur branché directement sur le collecteur | « Input for Demodulator » : circuit séparé | tension continue de sortie 6,93 V ; message 43,9 mV crête | Sans condensateur de liaison, un courant continu passe par L1, D1 et R5 (≈ 14 mA) : R5 = 500 Ω charge le circuit accordé et écrase la modulation. Il faut un condensateur de liaison entre la sortie AM et D1. |
+| ℹ️ | Démodulateur avec condensateur de liaison 1 µF | sinus de 500 Hz observé | message 12,3 mV crête à 500 Hz | comparer avec le branchement direct : le message récupéré est plus net |
 
 Hypothèses de la simulation :
 

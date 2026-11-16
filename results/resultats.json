@@ -185,7 +185,7 @@
     ],
     "tableaux": [],
     "lien": "https://www.youtube.com/watch?v=D5Se6hQdWQA",
-    "duree_s": 0.2
+    "duree_s": 0.3
   },
   {
     "tp": 3,
@@ -431,7 +431,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=MSSf-RjRAB4",
-    "duree_s": 0.1
+    "duree_s": 0.2
   },
   {
     "tp": 5,
@@ -706,7 +706,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=eaoYraDUfKk",
-    "duree_s": 0.1
+    "duree_s": 0.2
   },
   {
     "tp": 8,
@@ -957,6 +957,13 @@
         "commentaire": "0,029 venait d'une mesure précédente (Vmax = 12,3 V) ; avec les valeurs affichées μ ≈ 0,035"
       },
       {
+        "nom": "μ en retirant la tension continue du collecteur (8,3 V)",
+        "video": "μ ≈ 0,03 (tensions absolues)",
+        "simulation": "μ = (11,8 − 11)/(11,8 + 11 − 2 × 8,3) = 0,129",
+        "statut": "À VÉRIFIER",
+        "commentaire": "Le collecteur est polarisé à Vcc par L1. Si l'oscilloscope est en couplage continu (DC), les crêtes lues contiennent ces 8,3 V : la formule (Emax − Emin)/(Emax + Emin) sous-estime alors μ d'un facteur ≈ 4. Il faut mesurer en couplage alternatif (AC) ou retirer la composante continue."
+      },
+      {
         "nom": "Détecteur : 1/fc ≪ R5·C2 ≪ 1/fm",
         "video": "1/fc = 100 µs, 1/fm = 2 ms",
         "simulation": "R5·C2 = 500 µs",
@@ -964,32 +971,46 @@
         "commentaire": "condition respectée (5 périodes de porteuse, 1/4 de période du message)"
       },
       {
-        "nom": "Emax / Emin au collecteur (Vcc = 8,3 V)",
+        "nom": "Emax / Emin au collecteur, modulateur seul (Vcc = 8,3 V)",
         "video": "≈ 11,8 V / ≈ 11 V",
-        "simulation": "7,73 V / 7,63 V",
-        "statut": "À VÉRIFIER",
-        "commentaire": "crêtes de chaque cycle de porteuse sur 10 ms"
-      },
-      {
-        "nom": "Taux de modulation μ (même formule que la vidéo)",
-        "video": "≈ 0,03",
-        "simulation": "μ = 0,00605",
+        "simulation": "10,9 V / 10,3 V",
         "statut": "CONFIRMÉ",
-        "commentaire": "un μ très faible confirme que ce montage module peu ; la vidéo l'attribue au transistor de remplacement, la simulation montre que le schéma lui-même donne déjà un μ faible avec un BC107"
+        "commentaire": "crêtes de chaque cycle de porteuse sur 10 ms ; dépend du transistor et de la résistance de L1"
       },
       {
-        "nom": "Message récupéré après le détecteur",
-        "video": "sinus de 500 Hz observé",
-        "simulation": "43,9 mV crête à 500 Hz",
-        "statut": "INFO",
-        "commentaire": ""
+        "nom": "Taux de modulation μ (formule de la vidéo, tensions absolues)",
+        "video": "≈ 0,03",
+        "simulation": "μ = 0,0278",
+        "statut": "CONFIRMÉ",
+        "commentaire": "même ordre de grandeur que la vidéo : le montage module très peu"
       },
       {
-        "nom": "Même montage sous 12 V (valeur du schéma)",
+        "nom": "μ calculé sur la seule partie alternative",
         "video": "—",
-        "simulation": "Emax = 11 V ; Emin = 10,9 V ; μ = 0,00391",
+        "simulation": "μ = 0,129",
+        "statut": "INFO",
+        "commentaire": "en retirant la tension continue du collecteur (8,31 V) ; c'est la définition correcte de μ"
+      },
+      {
+        "nom": "Même modulateur sous 12 V (valeur du schéma)",
+        "video": "—",
+        "simulation": "Emax = 14,6 V ; Emin = 12,9 V ; μ = 0,06",
         "statut": "INFO",
         "commentaire": ""
+      },
+      {
+        "nom": "Démodulateur branché directement sur le collecteur",
+        "video": "« Input for Demodulator » : circuit séparé",
+        "simulation": "tension continue de sortie 6,93 V ; message 43,9 mV crête",
+        "statut": "ÉCART",
+        "commentaire": "Sans condensateur de liaison, un courant continu passe par L1, D1 et R5 (≈ 14 mA) : R5 = 500 Ω charge le circuit accordé et écrase la modulation. Il faut un condensateur de liaison entre la sortie AM et D1."
+      },
+      {
+        "nom": "Démodulateur avec condensateur de liaison 1 µF",
+        "video": "sinus de 500 Hz observé",
+        "simulation": "message 12,3 mV crête à 500 Hz",
+        "statut": "INFO",
+        "commentaire": "comparer avec le branchement direct : le message récupéré est plus net"
       }
     ],
     "hypotheses": [
@@ -1005,7 +1026,7 @@
     ],
     "tableaux": [],
     "lien": "https://www.youtube.com/watch?v=51hQ_KS0t9I",
-    "duree_s": 1.0
+    "duree_s": 1.9
   },
   {
     "tp": 12,
@@ -1081,7 +1102,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=tbTM0nnaiV4",
-    "duree_s": 0.3
+    "duree_s": 0.4
   },
   {
     "tp": 13,
