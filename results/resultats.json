@@ -1,0 +1,1175 @@
+[
+  {
+    "tp": 1,
+    "titre": "AM – maquette Omega ETB-96 (2 transistors BF-195, détecteur OA-79)",
+    "methode": "Modèle comportemental (Python) : signal AM idéal + détecteur diode/RC.",
+    "checks": [
+      {
+        "nom": "Fréquence du message",
+        "video": "4 div × 25 µs → 10 kHz (générateur : 10,0517 kHz)",
+        "simulation": "10 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "écart avec l'affichage du générateur : -0,51 %"
+      },
+      {
+        "nom": "Fréquence de la porteuse",
+        "video": "3 div × 2,5 µs → ≈ 133 kHz",
+        "simulation": "133,3 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "lecture ± 0,2 div → porteuse entre 125 kHz et 143 kHz"
+      },
+      {
+        "nom": "Vmax / Vmin de l'enveloppe",
+        "video": "4,8 V / 0,8 V",
+        "simulation": "4,8 V / 800 mV",
+        "statut": "CONFIRMÉ",
+        "commentaire": "crêtes de chaque cycle de porteuse (lecture aux curseurs simulée)"
+      },
+      {
+        "nom": "Taux de modulation m",
+        "video": "0,714 (71,4 %)",
+        "simulation": "0,714 (71,4 %)",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Raies latérales (fc ± fm)",
+        "video": "non mesurées dans la vidéo",
+        "simulation": "porteuse 2,8 V ; latérales 1 V et 999 mV (théorie m·Ac/2 = 1 V)",
+        "statut": "INFO",
+        "commentaire": "raies à 123 kHz et 143 kHz ; bande occupée B = 2·fm = 20 kHz"
+      },
+      {
+        "nom": "Rendement en puissance",
+        "video": "non calculé dans la vidéo",
+        "simulation": "η = m²/(2+m²) = 20,3 %",
+        "statut": "INFO",
+        "commentaire": ""
+      },
+      {
+        "nom": "Détecteur 10 kΩ / 0,01 µF : condition RC ≤ √(1−m²)/(m·ωm)",
+        "video": "message récupéré montré, distorsion non commentée",
+        "simulation": "RC = 100 µs > limite 15,6 µs → SINAD 12,2 dB à 10 kHz",
+        "statut": "ÉCART",
+        "commentaire": "La constante de temps est trop grande pour un message de 10 kHz à m = 0,71 : le condensateur ne suit pas la descente de l'enveloppe (écrêtage en diagonale), le message récupéré est déformé."
+      },
+      {
+        "nom": "Même détecteur avec un message de 1 kHz",
+        "video": "—",
+        "simulation": "SINAD 26,2 dB",
+        "statut": "INFO",
+        "commentaire": "pas d'écrêtage en diagonale ; la distorsion restante vient du seuil de la diode (Vmin = 0,8 V est proche du seuil)"
+      },
+      {
+        "nom": "Détecteur avec RC = 15 µs (1,5 nF)",
+        "video": "—",
+        "simulation": "SINAD 41,1 dB à 10 kHz",
+        "statut": "INFO",
+        "commentaire": "bonne restitution, mais l'ondulation de porteuse est forte (fc/fm = 13,3 seulement) et doit être filtrée"
+      },
+      {
+        "nom": "Fréquence maximale du message pour ce détecteur",
+        "video": "—",
+        "simulation": "1,56 kHz",
+        "statut": "INFO",
+        "commentaire": "au-delà, l'écrêtage en diagonale apparaît (m = 0,714, RC = 100 µs)"
+      }
+    ],
+    "hypotheses": [
+      "Signal AM idéal : la non-linéarité des transistors BF-195 n'est pas modélisée.",
+      "Diode OA-79 (germanium) modélisée par un seuil de 0,2 V et 300 Ω en série.",
+      "Valeurs du détecteur (10 kΩ, 0,01 µF) prises sur le schéma de la maquette ETB-96."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp01_am.png",
+        "legende": "Signal AM, spectre et détecteur d'enveloppe simulés"
+      }
+    ],
+    "tableaux": [],
+    "lien": "https://www.youtube.com/watch?v=YkTwZO9ub90",
+    "duree_s": 0.4
+  },
+  {
+    "tp": 2,
+    "titre": "FM – maquette FM Modulation & Demodulation (VCO + PLL)",
+    "methode": "Modèle comportemental (Python) : VCO idéal, lecture aux curseurs simulée, démodulation par discriminateur de phase.",
+    "checks": [
+      {
+        "nom": "Porteuse (2,2 div × 10 µs)",
+        "video": "45,45 kHz",
+        "simulation": "45,45 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Message (4 div × 50 µs)",
+        "video": "5 kHz",
+        "simulation": "5 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "fmax (1,8 div × 10 µs)",
+        "video": "≈ 55 kHz",
+        "simulation": "55,56 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "fmin (3,8 div × 10 µs)",
+        "video": "55 kHz écrit sur la feuille",
+        "simulation": "26,32 kHz",
+        "statut": "ÉCART",
+        "commentaire": "1/38 µs = 26,3 kHz : la valeur 55 kHz écrite pour fmin est une erreur de recopie (fmin doit être < fc)."
+      },
+      {
+        "nom": "Symétrie de l'excursion",
+        "video": "non discutée",
+        "simulation": "Δf+ = 10,1 kHz ; Δf− = 19,1 kHz ; milieu = 40,9 kHz",
+        "statut": "ÉCART",
+        "commentaire": "Un VCO linéaire donne Δf+ = Δf−. Ici Δf− ≈ 2·Δf+ : la lecture de 3,8 div est douteuse (ou le VCO est très non linéaire)."
+      },
+      {
+        "nom": "Lecture fmin attendue avec un VCO symétrique",
+        "video": "3,8 div (38 µs)",
+        "simulation": "2,8 div (28 µs) → fmin ≈ 35,7 kHz",
+        "statut": "ÉCART",
+        "commentaire": "Avec Δf = 10,1 kHz des deux côtés, la période la plus longue mesurée sur un cycle vaut ≈ 28 µs, pas 38 µs."
+      },
+      {
+        "nom": "Lecture fmax simulée (un cycle)",
+        "video": "1,8 div",
+        "simulation": "1,8 div → 55,4 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "un cycle de porteuse dure environ 1/9 de la période du message : la lecture moyenne un peu l’excursion"
+      },
+      {
+        "nom": "Indice de modulation β = Δf/fm",
+        "video": "non calculé",
+        "simulation": "β = 2,02 (avec Δf+)",
+        "statut": "INFO",
+        "commentaire": ""
+      },
+      {
+        "nom": "Bande de Carson B = 2(Δf + fm)",
+        "video": "non calculée",
+        "simulation": "30,2 kHz",
+        "statut": "INFO",
+        "commentaire": ""
+      },
+      {
+        "nom": "Bande à 98 % de puissance (simulée)",
+        "video": "—",
+        "simulation": "30 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "comparaison avec la règle de Carson"
+      },
+      {
+        "nom": "Démodulation : message récupéré à 5 kHz",
+        "video": "message récupéré montré (TP4)",
+        "simulation": "SINAD 82 dB",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "VCO idéal et linéaire ; le circuit interne de la maquette n'est pas connu.",
+      "Le démodulateur PLL de la maquette est remplacé par un discriminateur de phase idéal (même résultat pour un PLL verrouillé)."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp02_fm.png",
+        "legende": "FM simulée : lecture des fréquences et spectre"
+      }
+    ],
+    "tableaux": [],
+    "lien": "https://www.youtube.com/watch?v=D5Se6hQdWQA",
+    "duree_s": 0.2
+  },
+  {
+    "tp": 3,
+    "titre": "PAM naturel, sample & hold et flat-top – Scientech ST2110",
+    "methode": "Modèle comportemental (Python) : échantillonnage idéal + filtre de Butterworth.",
+    "checks": [
+      {
+        "nom": "Critère de Nyquist à fs = 8 kHz",
+        "video": "fs ≥ 2·fm (message 1 ou 2 kHz)",
+        "simulation": "fs/fmax = 4",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Critère de Nyquist à fs = 16 kHz",
+        "video": "fs ≥ 2·fm (message 1 ou 2 kHz)",
+        "simulation": "fs/fmax = 8",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Critère de Nyquist à fs = 32 kHz",
+        "video": "fs ≥ 2·fm (message 1 ou 2 kHz)",
+        "simulation": "fs/fmax = 16",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Critère de Nyquist à fs = 64 kHz",
+        "video": "fs ≥ 2·fm (message 1 ou 2 kHz)",
+        "simulation": "fs/fmax = 32",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Effet d'ouverture à 2 kHz, fs = 8 kHz",
+        "video": "non mesuré",
+        "simulation": "S&H : -0,91 dB ; flat-top τ = Ts/2 : -0,22 dB",
+        "statut": "INFO",
+        "commentaire": "le maintien atténue un peu les fréquences hautes du message (sinc)"
+      },
+      {
+        "nom": "Effet d'ouverture à 2 kHz, fs = 16 kHz",
+        "video": "non mesuré",
+        "simulation": "S&H : -0,22 dB ; flat-top τ = Ts/2 : -0,056 dB",
+        "statut": "INFO",
+        "commentaire": "le maintien atténue un peu les fréquences hautes du message (sinc)"
+      },
+      {
+        "nom": "Meilleure restitution quand fs augmente",
+        "video": "annoncé dans la vidéo",
+        "simulation": "naturel 1 kHz : 28,5 dB à 8 kHz → 103 dB à 64 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "Rapport cyclique des impulsions : 50 % (non indiqué dans la vidéo).",
+      "Filtre de démodulation : Butterworth d'ordre 4, coupure 3,4 kHz (le filtre réel du ST2110 n'est pas documenté).",
+      "SINAD : « correct » ≥ 30 dB, « limite » 20 à 30 dB, « dégradé » < 20 dB (seuils choisis pour la simulation)."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp03_pam.png",
+        "legende": "Les trois formes de PAM et le message récupéré"
+      }
+    ],
+    "tableaux": [
+      [
+        "SINAD du message récupéré après le filtre (simulation)",
+        [
+          "message",
+          "fs",
+          "naturel",
+          "sample & hold",
+          "flat-top (τ = Ts/2)"
+        ],
+        [
+          [
+            "1 kHz",
+            "8 kHz",
+            "28,5 dB (limite)",
+            "41,7 dB (correct)",
+            "27,6 dB (limite)"
+          ],
+          [
+            "1 kHz",
+            "16 kHz",
+            "54,1 dB (correct)",
+            "> 60 dB (correct)",
+            "53,9 dB (correct)"
+          ],
+          [
+            "1 kHz",
+            "32 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ],
+          [
+            "1 kHz",
+            "64 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ],
+          [
+            "2 kHz",
+            "8 kHz",
+            "23,6 dB (limite)",
+            "29,2 dB (limite)",
+            "21,6 dB (limite)"
+          ],
+          [
+            "2 kHz",
+            "16 kHz",
+            "52,5 dB (correct)",
+            "> 60 dB (correct)",
+            "51,7 dB (correct)"
+          ],
+          [
+            "2 kHz",
+            "32 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ],
+          [
+            "2 kHz",
+            "64 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ]
+        ]
+      ],
+      [
+        "Tableau de la vidéo rempli par la simulation (message 1 kHz)",
+        [
+          "fs",
+          "Type",
+          "Observation prédite"
+        ],
+        [
+          [
+            "16 kHz",
+            "naturel",
+            "sommets suivant le message ; message récupéré correct (54,1 dB)"
+          ],
+          [
+            "16 kHz",
+            "sample & hold",
+            "sommets plats ; message récupéré correct (> 60 dB)"
+          ],
+          [
+            "32 kHz",
+            "flat-top",
+            "sommets plats ; message récupéré correct (> 60 dB)"
+          ],
+          [
+            "64 kHz",
+            "flat-top",
+            "sommets plats ; message récupéré correct (> 60 dB)"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=vzdANFkMhSQ",
+    "duree_s": 0.3
+  },
+  {
+    "tp": 4,
+    "titre": "PWM – Scientech ST2110 (comparateur message / rampe)",
+    "methode": "Modèle comportemental (Python) : comparateur entre le message et une rampe, démodulation par filtre passe-bas.",
+    "checks": [
+      {
+        "nom": "Largeur τ = Ts·(1/2 + m(t)/(2·Ar))",
+        "video": "principe expliqué dans la vidéo",
+        "simulation": "largeurs mesurées sur les impulsions simulées",
+        "statut": "CONFIRMÉ",
+        "commentaire": "la largeur varie linéairement avec l'amplitude instantanée du message"
+      },
+      {
+        "nom": "Surmodulation",
+        "video": "—",
+        "simulation": "si A > 2,5 V les impulsions disparaissent ou fusionnent",
+        "statut": "INFO",
+        "commentaire": "l'amplitude du message doit rester inférieure à celle de la rampe"
+      },
+      {
+        "nom": "Démodulation par filtre passe-bas",
+        "video": "message récupéré sur la sortie audio",
+        "simulation": "SINAD 31,1 dB (A = 2 V)",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "Rampe ± 2,5 V et horloge 8 kHz supposées (non lues dans la vidéo) : les largeurs du tableau changent avec ces valeurs, pas la loi linéaire.",
+      "Filtre : Butterworth d'ordre 4, coupure 2,67 kHz (fs/3)."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp04_pwm.png",
+        "legende": "Génération PWM par comparaison et démodulation"
+      }
+    ],
+    "tableaux": [
+      [
+        "Tableau de la vidéo rempli par la simulation (fs = 8 kHz, message 1 kHz, rampe ± 2,5 V)",
+        [
+          "Amplitude du message",
+          "Largeur min",
+          "Largeur max",
+          "Observation"
+        ],
+        [
+          [
+            "500 mV",
+            "50,8 µs",
+            "74,7 µs",
+            "théorie 50 µs à 75 µs ; message récupéré 22,1 dB"
+          ],
+          [
+            "1 V",
+            "38,6 µs",
+            "86,9 µs",
+            "théorie 37,5 µs à 87,5 µs ; message récupéré 28 dB"
+          ],
+          [
+            "1,5 V",
+            "25,9 µs",
+            "99,6 µs",
+            "théorie 25 µs à 100 µs ; message récupéré 30,8 dB"
+          ],
+          [
+            "2 V",
+            "12,7 µs",
+            "113 µs",
+            "théorie 12,5 µs à 113 µs ; message récupéré 31,1 dB"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=MSSf-RjRAB4",
+    "duree_s": 0.1
+  },
+  {
+    "tp": 5,
+    "titre": "PWM – Excel Technologies ET-PWM (1 kHz / 8 kHz)",
+    "methode": "Modèle comportemental (Python) : modulateur à rampe synchronisée sur l'horloge 8 kHz.",
+    "checks": [
+      {
+        "nom": "Impulsions par période du message",
+        "video": "AF 1 kHz, horloge 8 kHz",
+        "simulation": "8 impulsions de période 125 µs",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Démodulation PWM par filtre passe-bas",
+        "video": "message 1 kHz récupéré",
+        "simulation": "SINAD 31,1 dB",
+        "statut": "CONFIRMÉ",
+        "commentaire": "avec seulement 8 impulsions par période, un filtre d'ordre 4 est nécessaire pour un sinus propre"
+      },
+      {
+        "nom": "Valeur moyenne de la PWM",
+        "video": "—",
+        "simulation": "2,51 V (moitié de 5 V : rapport cyclique moyen 50 %)",
+        "statut": "INFO",
+        "commentaire": "la composante continue est enlevée par le condensateur de liaison de la maquette"
+      }
+    ],
+    "hypotheses": [
+      "Rampe synchronisée sur l'horloge 8 kHz ; amplitude du message = 80 % de la rampe."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp05_pwm.png",
+        "legende": "PWM 1 kHz / 8 kHz et démodulation"
+      }
+    ],
+    "tableaux": [
+      [
+        "Démodulateur : SINAD selon le filtre (message 0,8 × rampe)",
+        [
+          "Coupure",
+          "Ordre",
+          "SINAD"
+        ],
+        [
+          [
+            "1,5 kHz",
+            "2",
+            "26,1 dB"
+          ],
+          [
+            "1,5 kHz",
+            "4",
+            "49,5 dB"
+          ],
+          [
+            "2,67 kHz",
+            "2",
+            "16,9 dB"
+          ],
+          [
+            "2,67 kHz",
+            "4",
+            "31,1 dB"
+          ],
+          [
+            "3,4 kHz",
+            "2",
+            "13 dB"
+          ],
+          [
+            "3,4 kHz",
+            "4",
+            "23,2 dB"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=MGXgkWwaYSs",
+    "duree_s": 0.1
+  },
+  {
+    "tp": 6,
+    "titre": "PWM – Akademika DCL-08 (caractéristique largeur / tension, déphasage)",
+    "methode": "Analyse des relevés (régression linéaire) + modèle de filtre de démodulation.",
+    "checks": [
+      {
+        "nom": "Largeur proportionnelle à la tension (droite croissante)",
+        "video": "courbe demandée : droite croissante",
+        "simulation": "w = 0,0219·V + 0,166 ; R² = 0,977",
+        "statut": "CONFIRMÉ",
+        "commentaire": "écart maximal à la droite : 0,0084 (unité de la feuille). La relation est bien linéaire."
+      },
+      {
+        "nom": "Unité « secs »",
+        "video": "0,18 à 0,26 « secs »",
+        "simulation": "0,18 à 0,26 ms",
+        "statut": "À VÉRIFIER",
+        "commentaire": "des largeurs de 0,2 s seraient impossibles avec une horloge de l'ordre du kHz : l'unité est très probablement la ms"
+      },
+      {
+        "nom": "Déphasage du signal démodulé",
+        "video": "0,6 × 250 µs = 150 µs",
+        "simulation": "150 µs = 54° à 1 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "valeur cohérente avec un filtre de démodulation de quelques kHz (voir tableau)"
+      }
+    ],
+    "hypotheses": [
+      "La fréquence du message pendant la mesure de déphasage (500 Hz ou 1 kHz) n'est pas certaine : les deux cas sont donnés."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp06_pwm.png",
+        "legende": "Caractéristique largeur / tension relevée dans la vidéo"
+      }
+    ],
+    "tableaux": [
+      [
+        "Relevés de la vidéo et droite ajustée",
+        [
+          "V (V)",
+          "largeur notée",
+          "droite",
+          "écart"
+        ],
+        [
+          [
+            "0,6",
+            "0,18",
+            "0,179",
+            "0,001"
+          ],
+          [
+            "1,4",
+            "0,2",
+            "0,197",
+            "0,0035"
+          ],
+          [
+            "2,4",
+            "0,21",
+            "0,218",
+            "-0,0084"
+          ],
+          [
+            "3,3",
+            "0,24",
+            "0,238",
+            "0,0018"
+          ],
+          [
+            "4,2",
+            "0,26",
+            "0,258",
+            "0,0021"
+          ]
+        ]
+      ],
+      [
+        "Déphasage mesuré 0,6 div × 250 µs = 150 µs : coupure du filtre qui le produit",
+        [
+          "message",
+          "déphasage",
+          "filtre ordre 1",
+          "Butterworth ordre 2",
+          "Butterworth ordre 4"
+        ],
+        [
+          [
+            "500 Hz",
+            "27°",
+            "981 Hz",
+            "1,55 kHz",
+            "2,79 kHz"
+          ],
+          [
+            "1 kHz",
+            "54°",
+            "727 Hz",
+            "1,64 kHz",
+            "2,82 kHz"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=Q6VduGGqPRE",
+    "duree_s": 0.1
+  },
+  {
+    "tp": 7,
+    "titre": "FM avec le générateur de fonctions ICL8038",
+    "methode": "Formule de la fiche technique + VCO comportemental (Python) : courants de charge proportionnels à V+ − V(broche 8).",
+    "checks": [
+      {
+        "nom": "Fréquence libre (RA = RB = 10 kΩ, C = 1 nF)",
+        "video": "f ≈ 0,3/(R·C) ≈ 30 kHz (calculé dans le cours)",
+        "simulation": "30 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "formule complète f = 1/[(5/3)·RA·C·(1 + RB/(2RA − RB))]"
+      },
+      {
+        "nom": "Rapport cyclique avec RA = RB",
+        "video": "signal carré / triangle symétrique",
+        "simulation": "t1 = 16,7 µs, t2 = 16,7 µs → 50 %",
+        "statut": "CONFIRMÉ",
+        "commentaire": "t1 = (5/3)·RA·C et t2 = (5/3)·RA·RB·C/(2RA − RB) : symétrique si RA = RB"
+      },
+      {
+        "nom": "Sensibilité du VCO",
+        "video": "tableau V / f à compléter",
+        "simulation": "K = f0/(0,2·Vs) = 12,5 kHz/V",
+        "statut": "INFO",
+        "commentaire": "la fréquence baisse quand la tension de la broche 8 monte vers V+"
+      },
+      {
+        "nom": "Exemple : m(t) = 0,5 V crête à 1 kHz sur la broche 8",
+        "video": "fmax, fmin, Δf, β à calculer",
+        "simulation": "fmax = 36,2 kHz ; fmin = 23,8 kHz ; Δf = 6,24 kHz ; β = 6,24",
+        "statut": "INFO",
+        "commentaire": "valeurs prédites pour remplir le tableau ; Δf = K·Am"
+      },
+      {
+        "nom": "Valeur 6,6 kΩ entre les broches 7 et 8",
+        "video": "lue 6,6 kΩ (peut-être 6,8 kΩ)",
+        "simulation": "6,6 kΩ n'est pas une valeur normalisée",
+        "statut": "À VÉRIFIER",
+        "commentaire": "la série E12 contient 6,8 kΩ ; cette résistance règle la polarisation FM, pas f0 (écart < 3 %)"
+      }
+    ],
+    "hypotheses": [
+      "RA, RB et C réels non lisibles dans la vidéo : RA = RB = 10 kΩ, C = 1 nF supposés.",
+      "Alimentation 12 V ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
+      "VCO idéal et linéaire ; la fiche technique annonce une linéarité de l'ordre de 0,5 % sur une large plage."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp07_fm.png",
+        "legende": "ICL8038 utilisé comme VCO"
+      }
+    ],
+    "tableaux": [
+      [
+        "Caractéristique du VCO prédite : f en fonction de la variation de V(broche 8) (V+ = 12 V)",
+        [
+          "ΔV broche 8 (V)",
+          "f"
+        ],
+        [
+          [
+            "-1",
+            "42,5 kHz"
+          ],
+          [
+            "-0,5",
+            "36,2 kHz"
+          ],
+          [
+            "0",
+            "30 kHz"
+          ],
+          [
+            "0,5",
+            "23,8 kHz"
+          ],
+          [
+            "1",
+            "17,5 kHz"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=eaoYraDUfKk",
+    "duree_s": 0.1
+  },
+  {
+    "tp": 8,
+    "titre": "PAM – maquette Excel Technologies (1 kHz / 8 kHz)",
+    "methode": "Modèle comportemental (Python) : interrupteur analogique commandé par une horloge 0/1.",
+    "checks": [
+      {
+        "nom": "Nyquist",
+        "video": "message 1 kHz, horloge 8 kHz",
+        "simulation": "fs/fm = 8 ≥ 2",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Impulsions par période du message",
+        "video": "—",
+        "simulation": "8 impulsions",
+        "statut": "INFO",
+        "commentaire": "8 échantillons par période : l'enveloppe des impulsions dessine bien le sinus"
+      },
+      {
+        "nom": "« Seule l'alternance positive apparaît » (dit à l'oral)",
+        "video": "horloge unipolaire 0/1 → seulement l'alternance positive",
+        "simulation": "interrupteur idéal : impulsions positives ET négatives",
+        "statut": "À VÉRIFIER",
+        "commentaire": "Une horloge 0/1 commande l'interrupteur mais ne fixe pas le signe des impulsions : un interrupteur analogique laisse passer les deux alternances. L'observation de la vidéo s'explique si l'étage de la maquette est alimenté en unipolaire (écrêtage) ou si le message porte un décalage continu. À vérifier sur la maquette."
+      },
+      {
+        "nom": "Message récupéré après filtre (cas idéal)",
+        "video": "démodulation non montrée",
+        "simulation": "SINAD 28,5 dB",
+        "statut": "INFO",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "Rapport cyclique 50 % ; filtre Butterworth d'ordre 4 à 3,4 kHz pour la démodulation."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp08_pam.png",
+        "legende": "Trois hypothèses pour expliquer l'alternance positive seule"
+      }
+    ],
+    "tableaux": [],
+    "lien": "https://www.youtube.com/watch?v=eeunlmRM_LA",
+    "duree_s": 0.2
+  },
+  {
+    "tp": 9,
+    "titre": "Démodulation FM par boucle à verrouillage de phase LM565",
+    "methode": "Formules de la fiche technique + PLL comportementale (Python).",
+    "checks": [
+      {
+        "nom": "Fréquence libre du VCO f0 = 1,2/(4·R1·C1)",
+        "video": "porteuse réglée à 9,4 kHz",
+        "simulation": "9,387 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "écart -0,14 %"
+      },
+      {
+        "nom": "Exemple de la fiche technique (R = 20 kΩ, C = 1,5 nF)",
+        "video": "—",
+        "simulation": "10 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "la fiche technique annonce 10 kHz : la formule est vérifiée"
+      },
+      {
+        "nom": "Plage de verrouillage à ±12 V : fL = ±8·f0/Vtot",
+        "video": "±12 V (écran) / « ±4 V » (oral)",
+        "simulation": "±3,13 kHz → de 6,26 kHz à 12,5 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "valeur du schéma et de l'écran"
+      },
+      {
+        "nom": "Plage de verrouillage à ±4 V : fL = ±8·f0/Vtot",
+        "video": "±12 V (écran) / « ±4 V » (oral)",
+        "simulation": "±9,39 kHz → de 0 Hz à 18,8 kHz",
+        "statut": "ÉCART",
+        "commentaire": "±4 V est hors de la plage d'alimentation (±5 à ±12 V) : c'est une erreur de transcription"
+      },
+      {
+        "nom": "Message récupéré à la sortie (broche 7)",
+        "video": "sinus 1 kHz récupéré à l'oscilloscope",
+        "simulation": "165 mV crête ; SINAD -5,61 dB brut, 24,7 dB après un filtre passe-bas de 3 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "amplitude attendue Δf/Ko = 161 mV. La sortie brute porte une forte ondulation à 2·f0 ≈ 18,8 kHz qu'un petit filtre passe-bas après la broche 7 enlève."
+      },
+      {
+        "nom": "Branchement de C1",
+        "video": "C1 relié à la masse dans la vidéo",
+        "simulation": "fiche technique : C1 entre broche 9 et −V (broche 1)",
+        "statut": "À VÉRIFIER",
+        "commentaire": "le circuit fonctionne aussi avec C1 à la masse, mais f0 peut s'écarter un peu de la formule"
+      }
+    ],
+    "hypotheses": [
+      "Excursion de fréquence du générateur non lue dans la vidéo : Δf = 1 kHz supposé.",
+      "Kd = 0,68 V/rad et Ko = 6600 Hz/V à 10 kHz (fiche technique) ; résistance interne broche 7 ≈ 3,6 kΩ.",
+      "Condensateur de filtre de boucle C2 = 10 nF supposé."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp09_pll.png",
+        "legende": "Sortie du LM565 simulé (message 1 kHz)"
+      }
+    ],
+    "tableaux": [],
+    "lien": "https://www.youtube.com/watch?v=3HIn2Pt3ySg",
+    "duree_s": 0.1
+  },
+  {
+    "tp": 10,
+    "titre": "FM avec un NE555 (astable, message sur la broche 5)",
+    "methode": "Simulation pas à pas (Python) du 555 : comparateurs, bascule, décharge, diode 1N4007 (modèle de Shockley), broche 5 modulée.",
+    "checks": [
+      {
+        "nom": "Tension de repos de la broche 5",
+        "video": "non mesurée",
+        "simulation": "2,5 V (au lieu de 2/3·Vcc = 3,33 V, à cause de R3 = 10 kΩ)",
+        "statut": "INFO",
+        "commentaire": "seuils de basculement : 2,5 V et 1,25 V"
+      },
+      {
+        "nom": "Fréquence sans message (C1 = 0,1 µF)",
+        "video": "≈ 11 kHz mesurés",
+        "simulation": "5,4 kHz",
+        "statut": "ÉCART",
+        "commentaire": "écart -51 % : les valeurs lues sur le schéma ne donnent pas 11 kHz"
+      },
+      {
+        "nom": "Condensateur qui donnerait 11 kHz",
+        "video": "C1 lu « 0,1 µF »",
+        "simulation": "49,1 nF",
+        "statut": "À VÉRIFIER",
+        "commentaire": "f est inversement proportionnelle à C1 : un condensateur de 47 nF (valeur normalisée) donnerait ≈ 11 kHz ; à vérifier sur la photo du montage"
+      },
+      {
+        "nom": "Hypothèse C1 = 47 nF",
+        "video": "≈ 11 kHz",
+        "simulation": "11,5 kHz",
+        "statut": "INFO",
+        "commentaire": "hypothèse compatible avec la mesure de la vidéo"
+      },
+      {
+        "nom": "Rapport cyclique avec la diode",
+        "video": "« diode : charge et décharge égales »",
+        "simulation": "39,3 %",
+        "statut": "ÉCART",
+        "commentaire": "Avec R3 = 10 kΩ, les seuils sont 2,5 V et 1,25 V : la charge vers ≈ 4,4 V (5 V − diode) est plus rapide que la décharge vers 0 V, même avec R1 = R2. Sans R3 (seuils 3,33 V et 1,67 V) on obtiendrait ≈ 56 %."
+      },
+      {
+        "nom": "Amplitude de sortie",
+        "video": "≈ 5,4 V avec Vcc = 5 V",
+        "simulation": "NE555 bipolaire : niveau haut ≈ Vcc − 1,7 V ≈ 3,3 V",
+        "statut": "À VÉRIFIER",
+        "commentaire": "5,4 V dépasse l'alimentation : lecture crête-à-crête avec dépassement, sonde mal réglée ou 555 CMOS"
+      },
+      {
+        "nom": "Sens de la modulation",
+        "video": "fréquence basse sur l'alternance positive",
+        "simulation": "broche 5 plus haute → seuils plus hauts → charge plus longue → fréquence plus basse",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      },
+      {
+        "nom": "Linéarité",
+        "video": "—",
+        "simulation": "Δf asymétrique : la charge ralentit fortement quand Vcv approche Vcc − 0,6 V",
+        "statut": "INFO",
+        "commentaire": "avec 1,5 V crête autour de 2,5 V, la broche 5 monte à 4 V : le 555 est très non linéaire ; un message plus faible serait plus fidèle"
+      }
+    ],
+    "hypotheses": [
+      "Pont interne 5 kΩ / 5 kΩ / 5 kΩ du 555 ; transistor de décharge saturé à 0,1 V.",
+      "Diode 1N4007 : Is = 7 nA, n = 1,8 ; sortie du générateur idéale."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp10_555.png",
+        "legende": "Astable 555 et fréquence instantanée modulée"
+      }
+    ],
+    "tableaux": [
+      [
+        "Tableau de la vidéo rempli par la simulation (C1 = 0,1 µF, message 200 Hz, 3 Vpp)",
+        [
+          "Segment",
+          "Fréquence simulée"
+        ],
+        [
+          [
+            "Alternance positive (fmin)",
+            "2,86 kHz"
+          ],
+          [
+            "Alternance négative (fmax)",
+            "7,74 kHz"
+          ],
+          [
+            "Δf = (fmax − fmin)/2",
+            "2,44 kHz"
+          ]
+        ]
+      ],
+      [
+        "Tableau de la vidéo rempli par la simulation (C1 = 47 nF, message 200 Hz, 3 Vpp)",
+        [
+          "Segment",
+          "Fréquence simulée"
+        ],
+        [
+          [
+            "Alternance positive (fmin)",
+            "6,11 kHz"
+          ],
+          [
+            "Alternance négative (fmax)",
+            "15,6 kHz"
+          ],
+          [
+            "Δf = (fmax − fmin)/2",
+            "4,73 kHz"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=xSqwbJl5yzU",
+    "duree_s": 0.7
+  },
+  {
+    "tp": 11,
+    "titre": "AM à transistor BC107BP + détecteur d'enveloppe (SPICE)",
+    "methode": "Simulation SPICE (ngspice) du schéma de la vidéo avec des modèles génériques BC107B et 1N4001.",
+    "checks": [
+      {
+        "nom": "Accord du circuit L1 // C1",
+        "video": "porteuse 10 kHz",
+        "simulation": "f0 = 1/(2π√(LC)) = 7,12 kHz",
+        "statut": "ÉCART",
+        "commentaire": "le circuit accordé est réglé -29 % sous la porteuse : le gain à 10 kHz est réduit. Il faudrait C1 ≈ 5,1 nF (ou L1 ≈ 25 mH) pour accorder sur 10 kHz."
+      },
+      {
+        "nom": "Calcul de μ avec Emax = 11,8 V et Emin = 11 V",
+        "video": "μ = 0,029 annoncé",
+        "simulation": "μ = 0,0351",
+        "statut": "ÉCART",
+        "commentaire": "0,029 venait d'une mesure précédente (Vmax = 12,3 V) ; avec les valeurs affichées μ ≈ 0,035"
+      },
+      {
+        "nom": "Détecteur : 1/fc ≪ R5·C2 ≪ 1/fm",
+        "video": "1/fc = 100 µs, 1/fm = 2 ms",
+        "simulation": "R5·C2 = 500 µs",
+        "statut": "CONFIRMÉ",
+        "commentaire": "condition respectée (5 périodes de porteuse, 1/4 de période du message)"
+      },
+      {
+        "nom": "Emax / Emin au collecteur (Vcc = 8,3 V)",
+        "video": "≈ 11,8 V / ≈ 11 V",
+        "simulation": "7,73 V / 7,63 V",
+        "statut": "À VÉRIFIER",
+        "commentaire": "crêtes de chaque cycle de porteuse sur 10 ms"
+      },
+      {
+        "nom": "Taux de modulation μ (même formule que la vidéo)",
+        "video": "≈ 0,03",
+        "simulation": "μ = 0,00605",
+        "statut": "CONFIRMÉ",
+        "commentaire": "un μ très faible confirme que ce montage module peu ; la vidéo l'attribue au transistor de remplacement, la simulation montre que le schéma lui-même donne déjà un μ faible avec un BC107"
+      },
+      {
+        "nom": "Message récupéré après le détecteur",
+        "video": "sinus de 500 Hz observé",
+        "simulation": "43,9 mV crête à 500 Hz",
+        "statut": "INFO",
+        "commentaire": ""
+      },
+      {
+        "nom": "Même montage sous 12 V (valeur du schéma)",
+        "video": "—",
+        "simulation": "Emax = 11 V ; Emin = 10,9 V ; μ = 0,00391",
+        "statut": "INFO",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "Modèles génériques BC107B et 1N4001 : le transistor réellement utilisé dans la vidéo n'est pas connu.",
+      "Résistance série de L1 : 50 Ω (non indiquée).",
+      "μ calculé comme dans la vidéo, avec les tensions absolues des crêtes : (Emax − Emin)/(Emax + Emin)."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp11_am_spice.png",
+        "legende": "Modulateur AM à BC107 simulé avec ngspice"
+      }
+    ],
+    "tableaux": [],
+    "lien": "https://www.youtube.com/watch?v=51hQ_KS0t9I",
+    "duree_s": 1.0
+  },
+  {
+    "tp": 12,
+    "titre": "PAM et démodulation – Scientech ST2110 (8 / 16 / 32 / 64 kHz)",
+    "methode": "Modèle comportemental (Python) : sorties Sample, Sample & Hold, Flat-Top + filtre.",
+    "checks": [
+      {
+        "nom": "Démodulation à 8 kHz et 16 kHz (affichées)",
+        "video": "message récupéré dans les deux cas",
+        "simulation": "8 kHz : 28,5 dB ; 16 kHz : 54,1 dB",
+        "statut": "CONFIRMÉ",
+        "commentaire": "à 8 kHz, une petite ondulation résiduelle reste visible ; à 16 kHz le sinus est propre"
+      },
+      {
+        "nom": "Câblage : message broche 2, impulsions broche 1",
+        "video": "dit à l'oral",
+        "simulation": "PAM = m(t) × p(t)",
+        "statut": "CONFIRMÉ",
+        "commentaire": "le modulateur multiplie le message par le train d'impulsions ; l'ordre des broches est propre à la maquette"
+      },
+      {
+        "nom": "Retard du message récupéré (« RC delay »)",
+        "video": "retard visible, non chiffré",
+        "simulation": "123 µs soit 44,3° à 1 kHz",
+        "statut": "INFO",
+        "commentaire": "retard de groupe du filtre de démodulation"
+      }
+    ],
+    "hypotheses": [
+      "Rapport cyclique 50 %, filtre Butterworth d'ordre 4 à 3,4 kHz (non documenté pour le ST2110)."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp12_pam.png",
+        "legende": "Démodulation PAM : retard du filtre et ondulation résiduelle"
+      }
+    ],
+    "tableaux": [
+      [
+        "Tableau de la vidéo rempli par la simulation (message 1 kHz)",
+        [
+          "Fréquence d'impulsion",
+          "Sample",
+          "Sample & Hold",
+          "Flat-Top"
+        ],
+        [
+          [
+            "8 kHz",
+            "28,5 dB (limite)",
+            "41,7 dB (correct)",
+            "27,6 dB (limite)"
+          ],
+          [
+            "16 kHz",
+            "54,1 dB (correct)",
+            "> 60 dB (correct)",
+            "53,9 dB (correct)"
+          ],
+          [
+            "32 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ],
+          [
+            "64 kHz",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)",
+            "> 60 dB (correct)"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=tbTM0nnaiV4",
+    "duree_s": 0.3
+  },
+  {
+    "tp": 13,
+    "titre": "PAM avancé – Vinytics CT-PAM ADV (fs 2 à 64 kHz, filtres d'ordre 2 et 4)",
+    "methode": "Modèle comportemental (Python) : PAM naturel + filtres de Butterworth d'ordre 2 et 4 ; balayage de la fréquence de coupure inconnue.",
+    "checks": [
+      {
+        "nom": "Fréquence du générateur",
+        "video": "réglé sur 1 kHz, mesuré 959 Hz",
+        "simulation": "écart -4,1 %",
+        "statut": "INFO",
+        "commentaire": "écart du générateur de la maquette (réglage du potentiomètre), sans effet sur la conclusion"
+      },
+      {
+        "nom": "Résultats annoncés (ordre 2 correct à 64/32 kHz, ordre 4 correct à 16 kHz, dégradé à 4 kHz)",
+        "video": "annoncés dans la vidéo",
+        "simulation": "reproduits pour une coupure de 2 kHz à 5 kHz",
+        "statut": "CONFIRMÉ",
+        "commentaire": "si l'on exige aussi que l'ordre 2 ne suffise plus à 16 kHz (raison du passage à l'ordre 4) : 3 kHz à 5 kHz"
+      },
+      {
+        "nom": "fs = 2 kHz (limite de Nyquist pour 1 kHz)",
+        "video": "non commenté",
+        "simulation": "fs = 2·fm : échantillons à phase fixe, message non récupérable",
+        "statut": "INFO",
+        "commentaire": "il faut fs > 2·fm, et en pratique fs ≥ 4 à 8·fm avec un filtre réel"
+      },
+      {
+        "nom": "fs = 4 kHz : image à fs − fm = 3 kHz",
+        "video": "signal dégradé",
+        "simulation": "image trop proche de 1 kHz pour être filtrée",
+        "statut": "CONFIRMÉ",
+        "commentaire": ""
+      }
+    ],
+    "hypotheses": [
+      "Fréquence de coupure des filtres de la maquette inconnue : balayée de 1,5 à 5 kHz.",
+      "Type de filtre : Butterworth ; rapport cyclique 50 % ; seuils SINAD 30 dB / 20 dB."
+    ],
+    "figures": [
+      {
+        "fichier": "figures/tp13_pam.png",
+        "legende": "Effet de fs et de l'ordre du filtre sur le message récupéré"
+      }
+    ],
+    "tableaux": [
+      [
+        "Message 1 kHz récupéré, coupure 4 kHz (simulation)",
+        [
+          "fs",
+          "Filtre d'ordre 2",
+          "Filtre d'ordre 4"
+        ],
+        [
+          [
+            "2 kHz",
+            "6,31 dB (dégradé)",
+            "5,72 dB (dégradé)"
+          ],
+          [
+            "4 kHz",
+            "3,68 dB (dégradé)",
+            "3,7 dB (dégradé)"
+          ],
+          [
+            "8 kHz",
+            "12,6 dB (dégradé)",
+            "22,9 dB (limite)"
+          ],
+          [
+            "16 kHz",
+            "24,8 dB (limite)",
+            "48,5 dB (correct)"
+          ],
+          [
+            "32 kHz",
+            "37 dB (correct)",
+            "> 60 dB (correct)"
+          ],
+          [
+            "64 kHz",
+            "49,1 dB (correct)",
+            "> 60 dB (correct)"
+          ]
+        ]
+      ]
+    ],
+    "lien": "https://www.youtube.com/watch?v=OZSDbqnP3Wo",
+    "duree_s": 0.4
+  }
+]
