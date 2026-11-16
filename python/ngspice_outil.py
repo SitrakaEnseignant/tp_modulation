@@ -37,6 +37,12 @@ def lance(circuit, pas=None, **params):
         if not f.exists():
             raise NgspiceErreur(f"{circuit} : pas de résultat\n{p.stdout[-3000:]}\n{p.stderr[-3000:]}")
         data = np.loadtxt(f)
+        m = re.search(r"^\.param\s+TSTOP\s*=\s*(\S+)", texte, flags=re.M | re.I)
+        if m:
+            tstop = _valeur(m.group(1))
+            if data[-1, 0] < 0.98 * tstop:
+                raise NgspiceErreur(f"{circuit} {params} : simulation arrêtée à {data[-1,0]:.4g} s sur {tstop:.4g} s\n"
+                                    + p.stdout[-3000:] + "\n" + p.stderr[-3000:])
     t = data[:, 0]
     courbes = [data[:, k] for k in range(1, data.shape[1], 2)]
     # ngspice peut répéter un instant : on garde des temps strictement croissants
@@ -48,6 +54,18 @@ def lance(circuit, pas=None, **params):
         courbes = [np.interp(tt, t, c) for c in courbes]
         t = tt
     return t, courbes
+
+
+def _valeur(txt):
+    """Convertit une valeur SPICE (3m, 0.1u, 10k...) en nombre."""
+    suf = {"t": 1e12, "g": 1e9, "meg": 1e6, "k": 1e3, "m": 1e-3, "u": 1e-6, "n": 1e-9, "p": 1e-12, "f": 1e-15}
+    m = re.match(r"([-+0-9.eE]+)([a-zA-Z]*)", txt)
+    v = float(m.group(1))
+    u = m.group(2).lower()
+    for k in ("meg", "t", "g", "k", "m", "u", "n", "p", "f"):
+        if u.startswith(k):
+            return v * suf[k]
+    return v
 
 
 disponible = ngspice_disponible

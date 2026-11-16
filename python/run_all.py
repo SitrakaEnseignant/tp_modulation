@@ -40,8 +40,11 @@ def main(selection):
             r = mod.run(fig_dir).to_dict()
             r["duree_s"] = round(time.time() - t0, 1)
             tous.append(r)
-            print(f"TP{n:02d} terminé en {r['duree_s']} s : " +
-                  ", ".join(f"{c['statut']}" for c in r["checks"]))
+            print(f"TP{n:02d} terminé en {r['duree_s']} s")
+            for c in r["checks"]:
+                print(f"   [{c['statut']}] {c['nom']} | vidéo : {c['video']} | simulation : {c['simulation']}")
+            for d in r["doutes"]:
+                print(f"   doute {d['statut']} : {d['doute']}")
         except Exception:
             tb = traceback.format_exc()
             print(f"TP{n:02d} ERREUR\n{tb}", file=sys.stderr)
