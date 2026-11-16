@@ -40,19 +40,19 @@ On peut indiquer les numéros de TP (par exemple `1 10 11`) ou laisser vide pour
 Sur un ordinateur :
 
 ```bash
-pip install -r requirements.txt
+pip install -r python/requirements.txt
 sudo apt-get install ngspice      # seulement pour le TP11
-python sim/run_all.py             # les 13 TP
-python sim/run_all.py 10 11       # quelques TP
+python python/run_all.py             # les 13 TP
+python python/run_all.py 10 11       # quelques TP
 ```
 
 ## Organisation
 
 ```
-sim/common.py         outils de mesure (fréquence, crêtes, SINAD, filtres)
-sim/pam.py, pwm.py    moteurs PAM et PWM partagés
-sim/tpNN_*.py         une simulation par TP
-sim/run_all.py        lance tout et écrit results/RAPPORT.md et results/resultats.json
+python/common.py      outils de mesure (fréquence, crêtes, SINAD, filtres)
+python/pam.py, pwm.py moteurs PAM et PWM partagés
+python/tpNN_*.py      une simulation par TP
+python/run_all.py     lance tout et écrit results/RAPPORT.md et results/resultats.json
 spice/                netlist ngspice du TP11 et modèles BC107B / 1N4001
 results/              rapport, figures et résultats JSON (écrits par GitHub Actions)
 ```

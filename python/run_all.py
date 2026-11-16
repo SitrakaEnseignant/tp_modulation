@@ -1,6 +1,6 @@
 """Lance les simulations des 13 TP et écrit results/RAPPORT.md + results/resultats.json.
 
-Usage : python sim/run_all.py [numéros de TP ...]
+Usage : python python/run_all.py [numéros de TP ...]
 """
 import importlib
 import sys

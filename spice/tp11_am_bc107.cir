@@ -1,5 +1,5 @@
 * TP11 - Modulateur AM a transistor BC107 et detecteur d'enveloppe (valeurs du schema de la video)
-* Ce fichier est un gabarit : sim/tp11_am_bc107.py remplace les champs entre accolades.
+* Ce fichier est un gabarit : python/tp11_am_bc107.py remplace les champs entre accolades.
 .include modeles.lib
 VCC vcc 0 DC {VCC}
 * porteuse 15 V crete, 10 kHz, appliquee a la base par R1
