@@ -1000,17 +1000,17 @@
       },
       {
         "nom": "Démodulateur du schéma branché sur la sortie AM",
-        "video": "sinus de 500 Hz observé",
+        "video": "démodulateur décrit sur la feuille (circuit séparé)",
         "simulation": "message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV)",
         "statut": "ÉCART",
         "commentaire": "le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes)"
       },
       {
-        "nom": "Meilleure variante de détecteur simulée",
+        "nom": "Conclusion sur le démodulateur",
         "video": "—",
-        "simulation": "schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF : 43,9 mV crête",
+        "simulation": "toutes les variantes chargent le circuit accordé",
         "statut": "INFO",
-        "commentaire": ""
+        "commentaire": "Le détecteur ne prend du courant qu'aux crêtes et écrase la tension du circuit accordé. Il faut un étage tampon (émetteur suiveur) entre la sortie AM et le détecteur, ou tester le démodulateur séparément avec un générateur AM, comme le suggère la feuille de la vidéo."
       }
     ],
     "hypotheses": [
@@ -1056,7 +1056,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=51hQ_KS0t9I",
-    "duree_s": 2.2
+    "duree_s": 2.3
   },
   {
     "tp": 12,

@@ -346,8 +346,8 @@ Méthode : Simulation SPICE (ngspice) du schéma de la vidéo avec des modèles 
 | ✅ | Taux de modulation μ (formule de la vidéo, tensions absolues) | ≈ 0,03 | μ = 0,0278 | la simulation retrouve la valeur de la vidéo avec un BC107 : le transistor de remplacement n'est pas nécessaire pour l'expliquer ; la valeur faible vient surtout de la tension continue (ligne suivante) |
 | ✅ | μ calculé sur la seule partie alternative | 0,129 en corrigeant les valeurs de la vidéo | μ = 0,129 | en retirant la tension continue du collecteur (8,31 V) : c'est la définition correcte de μ. Le vrai taux de modulation est ≈ 13 %, pas 3 %. |
 | ℹ️ | Même modulateur sous 12 V (valeur du schéma) | — | Emax = 14,6 V ; Emin = 12,9 V ; μ = 0,06 |  |
-| ❌ | Démodulateur du schéma branché sur la sortie AM | sinus de 500 Hz observé | message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV) | le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes) |
-| ℹ️ | Meilleure variante de détecteur simulée | — | schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF : 43,9 mV crête |  |
+| ❌ | Démodulateur du schéma branché sur la sortie AM | démodulateur décrit sur la feuille (circuit séparé) | message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV) | le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes) |
+| ℹ️ | Conclusion sur le démodulateur | — | toutes les variantes chargent le circuit accordé | Le détecteur ne prend du courant qu'aux crêtes et écrase la tension du circuit accordé. Il faut un étage tampon (émetteur suiveur) entre la sortie AM et le détecteur, ou tester le démodulateur séparément avec un générateur AM, comme le suggère la feuille de la vidéo. |
 
 **Démodulateur branché sur la sortie AM (collecteur à vide : 10,9 V / 10,3 V, variation d'enveloppe 295 mV crête)**
 
