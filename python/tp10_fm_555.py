@@ -84,7 +84,7 @@ def run(outdir):
     r.check("Hypothèse C1 = 47 nF", "≈ 11 kHz", fmt(1 / per47[2:].mean(), "Hz"), INFO,
             "hypothèse compatible avec la mesure de la vidéo")
     r.check("Rapport cyclique avec la diode", "« diode : charge et décharge égales »", f"{fr(100*duty)} %",
-            CONFIRME if 40 < 100 * duty < 60 else ECART,
+            CONFIRME if 45 < 100 * duty < 55 else ECART,
             "Avec R3 = 10 kΩ, les seuils sont 2,5 V et 1,25 V : la charge vers ≈ 4,4 V (5 V − diode) est plus rapide "
             "que la décharge vers 0 V, même avec R1 = R2. Sans R3 (seuils 3,33 V et 1,67 V) on obtiendrait ≈ 56 %.")
     r.check("Amplitude de sortie", "≈ 5,4 V avec Vcc = 5 V", "NE555 bipolaire : niveau haut ≈ Vcc − 1,7 V ≈ 3,3 V",
@@ -141,7 +141,7 @@ def _ngspice(r, f_py, duty_py, outdir):
     r.check("[ngspice] Fréquence sans message (C1 = 0,1 µF)", "≈ 11 kHz", fmt(f1, "Hz"), ECART,
             f"même résultat que la simulation Python ({fmt(f_py,'Hz')}) avec un autre simulateur et une vraie diode SPICE")
     r.check("[ngspice] Rapport cyclique", "« charge et décharge égales »", f"{fr(100*d1)} %",
-            CONFIRME if 40 < 100 * d1 < 60 else ECART, f"Python : {fr(100*duty_py)} %")
+            CONFIRME if 45 < 100 * d1 < 55 else ECART, f"Python : {fr(100*duty_py)} %")
     r.check("[ngspice] Niveau haut de la sortie", "≈ 5,4 V", fmt(vh, "V"), ECART,
             "un NE555 bipolaire sous 5 V ne peut pas sortir 5,4 V")
     f47, *_ = libre("47n")

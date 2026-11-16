@@ -73,6 +73,9 @@ def run(outdir):
 def _freqs(t, sq, debut):
     sel = t > debut
     tc, per = periodes_cycle(sq[sel], t[sel], 0.5 * (sq.max() + sq.min()))
+    if len(per) < 2:
+        raise RuntimeError(f"ICL8038 simulé : pas d'oscillation après {debut} s "
+                           f"(carré entre {sq.min():.3g} et {sq.max():.3g} V)")
     return tc, 1 / per
 
 

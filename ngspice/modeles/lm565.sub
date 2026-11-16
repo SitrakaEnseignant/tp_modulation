@@ -17,16 +17,16 @@ R6 r6 ref 100
 * comparateur de phase et résistance interne
 Bpd pdo vm V = v(ref,vm) + tanh(v(in1,in2)/0.01)*tanh(v(pdin,ref)/0.01)
 R7 pdo out 3.6k
-* VCO : broche 8 à +V − 0,6 V
+* VCO : broche 8 à +V − 0,6 V ; courant I1 mesuré par la résistance de 1 Ω Rs8
 B8 n8 vm V = v(vp,vm) - 0.6
-V8s tr n8 0
+Rs8 tr n8 1
 * seuils de C1 : référence ± 0,5 V
 Bhi rr vm V = 0.5*(1+tanh((v(tc,ref) - 0.5)/0.005))
 Blo s vm V = 0.5*(1+tanh((-0.5 - v(tc,ref))/0.005))
 Bq qi vm V = v(s,vm) + (1 - v(s,vm))*(1 - v(rr,vm))*v(qm,vm)
 Rq qi qm 1k
 Cq qm vm 1p
-Bc vm tc I = (2*v(qm,vm) - 1)*i(V8s)*max(0.02, 1 + 50/(6.2832*v(vp,vm))*v(out,ref))
+Bc vm tc I = (2*v(qm,vm) - 1)*v(tr,n8)*max(0.02, 1 + 50/(6.2832*v(vp,vm))*v(out,ref))
 * sortie du VCO (broche 4) : carré ±1 V autour de la référence
 Bv4 v4 vm V = v(ref,vm) + 2*v(qm,vm) - 1
 R4 v4 vcoout 100
