@@ -1,5 +1,5 @@
 * TP11 - Modulateur AM a transistor BC107 et detecteur d'enveloppe (valeurs du schema de la video)
-* Ce fichier est un gabarit : sim/tp11_am_bc107.py remplace {VCC}, {AMSG}, {RL} et {OUT}.
+* Ce fichier est un gabarit : sim/tp11_am_bc107.py remplace {VCC}, {AMSG}, {RL}, {DETECTEUR}, {SONDE} et {OUT}.
 .include modeles.lib
 VCC vcc 0 DC {VCC}
 * porteuse 15 V crete, 10 kHz, appliquee a la base par R1
@@ -16,15 +16,13 @@ VMSG em 0 SIN(0 {AMSG} 500)
 L1 vcc nl 50m
 RL nl c {RL}
 C1 vcc c 10n
-* detecteur d'enveloppe
-D1 c out D1N4001
-C2 out 0 1u
-R5 out 0 500
+* detecteur d'enveloppe (D1 1N4001G, C2 = 1 uF, R5 = 500 ohms) : branchement choisi par le script
+{DETECTEUR}
 .options reltol=1e-4
 .tran 0.5u 30m 0 0.5u
 .control
 run
-wrdata {OUT} v(c) v(out)
+wrdata {OUT} v(c) {SONDE}
 quit
 .endc
 .end
