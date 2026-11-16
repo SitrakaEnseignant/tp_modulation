@@ -19,6 +19,8 @@ DETECTEURS = {
     "direct": ("D1 c out D1N4001\nC2 out 0 1u\nR5 out 0 500", "v(out)"),
     # même branchement, mais R5 = 10 kΩ et C2 = 47 nF (même constante de temps ≈ 0,5 ms)
     "r5_10k": ("D1 c out D1N4001\nC2 out 0 47n\nR5 out 0 10k", "v(out)"),
+    # diode rapide 1N4148 avec R5 = 10 kΩ et C2 = 47 nF
+    "rapide": ("D1 c out D1N4148\nC2 out 0 47n\nR5 out 0 10k", "v(out)"),
 }
 
 
@@ -101,22 +103,36 @@ def run(outdir):
     r.check("Même modulateur sous 12 V (valeur du schéma)", "—",
             f"Emax = {fmt(e12[0],'V')} ; Emin = {fmt(e12[1],'V')} ; μ = {fr((e12[0]-e12[1])/(e12[0]+e12[1]))}", INFO)
 
-    # 2) démodulateur branché directement sur le collecteur
-    td, vcd, vod = lance_spice(8.3, 4.5, detecteur="direct")
-    ed = mesure(td, vcd, vod)
-    r.check("Démodulateur du schéma (R5 = 500 Ω) branché sur la sortie AM", "« Input for Demodulator » : circuit séparé",
-            f"tension continue {fmt(float(np.mean(ed[4])),'V')} ; message {fmt(ed[7],'V')} crête", ECART,
-            "R5 = 500 Ω est très faible devant l'impédance du circuit accordé (≈ 3 kΩ à 10 kHz) : environ 14 mA "
-            "traversent L1, D1 et R5, le circuit accordé est écrasé et le message récupéré devient très petit.")
-    # 3) même détecteur avec R5 = 10 kΩ et C2 = 47 nF
-    tl, vcl, vol = lance_spice(8.3, 4.5, detecteur="r5_10k")
-    el = mesure(tl, vcl, vol)
-    r.check("Détecteur avec R5 = 10 kΩ et C2 = 47 nF (même RC)", "sinus de 500 Hz observé",
-            f"message {fmt(el[7],'V')} crête à 500 Hz", INFO,
-            f"{fr(el[7]/max(ed[7],1e-9),2)} fois plus grand qu'avec 500 Ω : une résistance de charge plus élevée "
-            "(ou un étage tampon) est nécessaire")
+    # 2) démodulateur branché sur la sortie AM : schéma de la vidéo et deux variantes
+    attendu = (emax - emin) / 2
+    variantes = [("direct", "schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF"),
+                 ("r5_10k", "1N4001, R5 = 10 kΩ, C2 = 47 nF"),
+                 ("rapide", "1N4148, R5 = 10 kΩ, C2 = 47 nF")]
+    lignes, sorties = [], {}
+    for cle, nom in variantes:
+        tv, vcv, vov = lance_spice(8.3, 4.5, detecteur=cle)
+        e = mesure(tv, vcv, vov)
+        sorties[cle] = e
+        lignes.append([nom, f"{fmt(e[0],'V')} / {fmt(e[1],'V')}", fmt(float(np.mean(e[4])), "V"), fmt(e[7], "V")])
+    r.tableaux.append((f"Démodulateur branché sur la sortie AM (collecteur à vide : {fmt(emax,'V')} / {fmt(emin,'V')}, "
+                       f"variation d'enveloppe {fmt(attendu,'V')} crête)",
+                       ["Détecteur", "Emax / Emin au collecteur", "Continu en sortie", "Message 500 Hz (crête)"], lignes))
+    ed = sorties["direct"]
+    charge = (ed[0] - ed[1]) / 2
+    r.check("Démodulateur du schéma branché sur la sortie AM", "sinus de 500 Hz observé",
+            f"message {fmt(ed[7],'V')} crête ; enveloppe au collecteur {fmt(charge,'V')} crête (à vide : {fmt(attendu,'V')})",
+            CONFIRME if ed[7] > 0.5 * attendu else ECART,
+            ("le détecteur restitue bien la variation d'enveloppe" if ed[7] > 0.5 * attendu else
+             ("le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre"
+              if charge < 0.5 * attendu else
+              "la modulation au collecteur reste présente mais le détecteur la restitue mal"))
+            + " (voir le tableau des variantes)")
+    meilleur = max(sorties, key=lambda k: sorties[k][7])
+    r.check("Meilleure variante de détecteur simulée", "—",
+            f"{dict(variantes)[meilleur]} : {fmt(sorties[meilleur][7],'V')} crête", INFO)
     tt_d, vo_d = ed[2], ed[4]
-    tt_l, vo_l = el[2], el[4]
+    tt_l, vo_l = sorties[meilleur][2], sorties[meilleur][4]
+    titre_l = dict(variantes)[meilleur]
     r.hypotheses += ["Modèles génériques BC107B et 1N4001 : le transistor réellement utilisé dans la vidéo n'est pas connu.",
                      "Résistance série de L1 : 50 Ω (non indiquée).",
                      "μ calculé comme dans la vidéo, avec les tensions absolues des crêtes : (Emax − Emin)/(Emax + Emin)."]
@@ -127,7 +143,7 @@ def run(outdir):
     ax[1].plot((tt_d - tt_d[0]) * 1e3, vo_d, lw=1)
     ax[1].set_title("Sortie du détecteur du schéma (R5 = 500 Ω, C2 = 1 µF)", fontsize=9)
     ax[2].plot((tt_l - tt_l[0]) * 1e3, vo_l, lw=1)
-    ax[2].set_title("Sortie du détecteur avec R5 = 10 kΩ et C2 = 47 nF", fontsize=9)
+    ax[2].set_title(f"Sortie du détecteur : {titre_l}", fontsize=9)
     for a_ in ax:
         a_.set_xlabel("t (ms)")
     sauve(fig, r, outdir, "tp11_am_spice.png", "Modulateur AM à BC107 simulé avec ngspice")

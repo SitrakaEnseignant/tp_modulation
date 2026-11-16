@@ -6,3 +6,5 @@
 * 1N4001 : diode de redressement
 .model D1N4001 D(IS=14.11N N=1.984 RS=33.89M IKF=94.81 XTI=3 EG=1.11 CJO=25.89P M=.44
 + VJ=.3245 FC=.5 BV=75 IBV=10U TT=5.7U)
+* 1N4148 : diode de commutation rapide (pour comparaison)
+.model D1N4148 D(IS=2.52N RS=.568 N=1.752 CJO=4P M=.4 TT=20N BV=100 IBV=100U)
