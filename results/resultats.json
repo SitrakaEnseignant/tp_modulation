@@ -88,7 +88,7 @@
     ],
     "tableaux": [],
     "lien": "https://www.youtube.com/watch?v=YkTwZO9ub90",
-    "duree_s": 0.3
+    "duree_s": 0.4
   },
   {
     "tp": 2,
@@ -185,7 +185,7 @@
     ],
     "tableaux": [],
     "lien": "https://www.youtube.com/watch?v=D5Se6hQdWQA",
-    "duree_s": 0.2
+    "duree_s": 0.3
   },
   {
     "tp": 3,
@@ -431,7 +431,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=MSSf-RjRAB4",
-    "duree_s": 0.1
+    "duree_s": 0.2
   },
   {
     "tp": 5,
@@ -706,7 +706,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=eaoYraDUfKk",
-    "duree_s": 0.1
+    "duree_s": 0.2
   },
   {
     "tp": 8,
@@ -935,7 +935,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=xSqwbJl5yzU",
-    "duree_s": 0.5
+    "duree_s": 0.7
   },
   {
     "tp": 11,
@@ -999,18 +999,18 @@
         "commentaire": ""
       },
       {
-        "nom": "Démodulateur du schéma (R5 = 500 Ω) branché sur la sortie AM",
-        "video": "« Input for Demodulator » : circuit séparé",
-        "simulation": "tension continue 6,93 V ; message 43,9 mV crête",
+        "nom": "Démodulateur du schéma branché sur la sortie AM",
+        "video": "sinus de 500 Hz observé",
+        "simulation": "message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV)",
         "statut": "ÉCART",
-        "commentaire": "R5 = 500 Ω est très faible devant l'impédance du circuit accordé (≈ 3 kΩ à 10 kHz) : environ 14 mA traversent L1, D1 et R5, le circuit accordé est écrasé et le message récupéré devient très petit."
+        "commentaire": "le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes)"
       },
       {
-        "nom": "Détecteur avec R5 = 10 kΩ et C2 = 47 nF (même RC)",
-        "video": "sinus de 500 Hz observé",
-        "simulation": "message 36,1 mV crête à 500 Hz",
+        "nom": "Meilleure variante de détecteur simulée",
+        "video": "—",
+        "simulation": "schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF : 43,9 mV crête",
         "statut": "INFO",
-        "commentaire": "0,82 fois plus grand qu'avec 500 Ω : une résistance de charge plus élevée (ou un étage tampon) est nécessaire"
+        "commentaire": ""
       }
     ],
     "hypotheses": [
@@ -1024,9 +1024,39 @@
         "legende": "Modulateur AM à BC107 simulé avec ngspice"
       }
     ],
-    "tableaux": [],
+    "tableaux": [
+      [
+        "Démodulateur branché sur la sortie AM (collecteur à vide : 10,9 V / 10,3 V, variation d'enveloppe 295 mV crête)",
+        [
+          "Détecteur",
+          "Emax / Emin au collecteur",
+          "Continu en sortie",
+          "Message 500 Hz (crête)"
+        ],
+        [
+          [
+            "schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF",
+            "7,73 V / 7,63 V",
+            "6,93 V",
+            "43,9 mV"
+          ],
+          [
+            "1N4001, R5 = 10 kΩ, C2 = 47 nF",
+            "8,85 V / 8,71 V",
+            "7,74 V",
+            "36,1 mV"
+          ],
+          [
+            "1N4148, R5 = 10 kΩ, C2 = 47 nF",
+            "8,82 V / 8,71 V",
+            "7,75 V",
+            "32,3 mV"
+          ]
+        ]
+      ]
+    ],
     "lien": "https://www.youtube.com/watch?v=51hQ_KS0t9I",
-    "duree_s": 1.4
+    "duree_s": 2.2
   },
   {
     "tp": 12,
@@ -1102,7 +1132,7 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=tbTM0nnaiV4",
-    "duree_s": 0.3
+    "duree_s": 0.4
   },
   {
     "tp": 13,
@@ -1191,6 +1221,6 @@
       ]
     ],
     "lien": "https://www.youtube.com/watch?v=OZSDbqnP3Wo",
-    "duree_s": 0.3
+    "duree_s": 0.4
   }
 ]

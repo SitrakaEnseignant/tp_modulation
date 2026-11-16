@@ -346,8 +346,16 @@ Méthode : Simulation SPICE (ngspice) du schéma de la vidéo avec des modèles 
 | ✅ | Taux de modulation μ (formule de la vidéo, tensions absolues) | ≈ 0,03 | μ = 0,0278 | la simulation retrouve la valeur de la vidéo avec un BC107 : le transistor de remplacement n'est pas nécessaire pour l'expliquer ; la valeur faible vient surtout de la tension continue (ligne suivante) |
 | ✅ | μ calculé sur la seule partie alternative | 0,129 en corrigeant les valeurs de la vidéo | μ = 0,129 | en retirant la tension continue du collecteur (8,31 V) : c'est la définition correcte de μ. Le vrai taux de modulation est ≈ 13 %, pas 3 %. |
 | ℹ️ | Même modulateur sous 12 V (valeur du schéma) | — | Emax = 14,6 V ; Emin = 12,9 V ; μ = 0,06 |  |
-| ❌ | Démodulateur du schéma (R5 = 500 Ω) branché sur la sortie AM | « Input for Demodulator » : circuit séparé | tension continue 6,93 V ; message 43,9 mV crête | R5 = 500 Ω est très faible devant l'impédance du circuit accordé (≈ 3 kΩ à 10 kHz) : environ 14 mA traversent L1, D1 et R5, le circuit accordé est écrasé et le message récupéré devient très petit. |
-| ℹ️ | Détecteur avec R5 = 10 kΩ et C2 = 47 nF (même RC) | sinus de 500 Hz observé | message 36,1 mV crête à 500 Hz | 0,82 fois plus grand qu'avec 500 Ω : une résistance de charge plus élevée (ou un étage tampon) est nécessaire |
+| ❌ | Démodulateur du schéma branché sur la sortie AM | sinus de 500 Hz observé | message 43,9 mV crête ; enveloppe au collecteur 46,4 mV crête (à vide : 295 mV) | le détecteur charge fortement le circuit accordé : la modulation au collecteur s'effondre (voir le tableau des variantes) |
+| ℹ️ | Meilleure variante de détecteur simulée | — | schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF : 43,9 mV crête |  |
+
+**Démodulateur branché sur la sortie AM (collecteur à vide : 10,9 V / 10,3 V, variation d'enveloppe 295 mV crête)**
+
+| Détecteur | Emax / Emin au collecteur | Continu en sortie | Message 500 Hz (crête) |
+|---|---|---|---|
+| schéma : 1N4001, R5 = 500 Ω, C2 = 1 µF | 7,73 V / 7,63 V | 6,93 V | 43,9 mV |
+| 1N4001, R5 = 10 kΩ, C2 = 47 nF | 8,85 V / 8,71 V | 7,74 V | 36,1 mV |
+| 1N4148, R5 = 10 kΩ, C2 = 47 nF | 8,82 V / 8,71 V | 7,75 V | 32,3 mV |
 
 Hypothèses de la simulation :
 
