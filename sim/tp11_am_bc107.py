@@ -119,7 +119,7 @@ def run(outdir):
                        ["Détecteur", "Emax / Emin au collecteur", "Continu en sortie", "Message 500 Hz (crête)"], lignes))
     ed = sorties["direct"]
     charge = (ed[0] - ed[1]) / 2
-    r.check("Démodulateur du schéma branché sur la sortie AM", "sinus de 500 Hz observé",
+    r.check("Démodulateur du schéma branché sur la sortie AM", "démodulateur décrit sur la feuille (circuit séparé)",
             f"message {fmt(ed[7],'V')} crête ; enveloppe au collecteur {fmt(charge,'V')} crête (à vide : {fmt(attendu,'V')})",
             CONFIRME if ed[7] > 0.5 * attendu else ECART,
             ("le détecteur restitue bien la variation d'enveloppe" if ed[7] > 0.5 * attendu else
@@ -127,9 +127,15 @@ def run(outdir):
               if charge < 0.5 * attendu else
               "la modulation au collecteur reste présente mais le détecteur la restitue mal"))
             + " (voir le tableau des variantes)")
-    meilleur = max(sorties, key=lambda k: sorties[k][7])
-    r.check("Meilleure variante de détecteur simulée", "—",
-            f"{dict(variantes)[meilleur]} : {fmt(sorties[meilleur][7],'V')} crête", INFO)
+    tous_chargent = all((e[0] - e[1]) / 2 < 0.5 * attendu for e in sorties.values())
+    r.check("Conclusion sur le démodulateur", "—",
+            "toutes les variantes chargent le circuit accordé" if tous_chargent else "au moins une variante convient",
+            INFO,
+            "Le détecteur ne prend du courant qu'aux crêtes et écrase la tension du circuit accordé. Il faut un étage "
+            "tampon (émetteur suiveur) entre la sortie AM et le détecteur, ou tester le démodulateur séparément avec "
+            "un générateur AM, comme le suggère la feuille de la vidéo." if tous_chargent else
+            "voir le tableau des variantes")
+    meilleur = "r5_10k"
     tt_d, vo_d = ed[2], ed[4]
     tt_l, vo_l = sorties[meilleur][2], sorties[meilleur][4]
     titre_l = dict(variantes)[meilleur]
