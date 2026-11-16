@@ -22,7 +22,8 @@ C2 out 0 150n
 CIN in1 src 10u
 RIN1 in1 0 600
 RIN2 in2 0 600
-VIN src 0 SFFM(0 {VA} {FC} {MDI} {FMOD})
+* ngspice : SFFM(décalage amplitude f_message indice f_porteuse)
+VIN src 0 SFFM(0 {VA} {FMOD} {MDI} {FC})
 .ic v(tc)=0 v(out)=0 v(in1)=0
 .options method=gear reltol=1e-4
 .tran 0.2u {TSTOP} 0 0.2u uic

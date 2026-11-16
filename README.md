@@ -9,17 +9,17 @@ Chaque simulation compare les valeurs relevées dans la vidéo avec ce que donne
 
 | TP | Sujet | Méthode |
 |---|---|---|
-| 01 | AM, maquette Omega ETB-96 | signal AM, spectre, détecteur d'enveloppe diode/RC |
+| 01 | AM, maquette Omega ETB-96 | signal AM, spectre ; ngspice : détecteur à diode OA-79 |
 | 02 | FM, maquette VCO + PLL | lecture des fréquences cycle par cycle, Carson, démodulation |
 | 03 | PAM naturel / S&H / flat-top, ST2110 | échantillonnage 8 à 64 kHz + filtre |
 | 04 | PWM, ST2110 | comparateur message / rampe, largeurs, démodulation |
 | 05 | PWM, Excel ET-PWM | 1 kHz / 8 kHz, choix du filtre |
 | 06 | PWM, Akademika DCL-08 | régression sur les relevés, déphasage |
-| 07 | FM avec ICL8038 | formule de la fiche technique, VCO |
+| 07 | FM avec ICL8038 | formule de la fiche technique ; ngspice : montage complet |
 | 08 | PAM, Excel | rôle de l'horloge unipolaire |
-| 09 | Démodulation FM, LM565 | formules de la fiche technique, PLL |
-| 10 | FM avec NE555 | simulation pas à pas du 555 avec diode |
-| 11 | AM à transistor BC107 | **SPICE (ngspice)** du schéma complet |
+| 09 | Démodulation FM, LM565 | formules de la fiche technique ; ngspice : PLL complète |
+| 10 | FM avec NE555 | simulation pas à pas ; ngspice : montage complet |
+| 11 | AM à transistor BC107 | ngspice : schéma complet |
 | 12 | PAM et démodulation, ST2110 | 8 / 16 / 32 / 64 kHz, retard du filtre |
 | 13 | PAM avancé, Vinytics | filtres d'ordre 2 et 4, coupure balayée |
 
@@ -31,6 +31,22 @@ Les statuts du rapport :
 - ℹ️ **valeur prédite** : la vidéo laisse le tableau vide, la simulation le remplit.
 
 Chaque TP liste ses hypothèses (valeurs supposées) à la fin de sa section.
+Le rapport commence par un tableau des **doutes du cours** : levés, réduits ou encore ouverts.
+
+## Simulateur électronique ngspice
+
+Les TP montés à partir de composants (TP01, 07, 09, 10, 11) sont simulés comme de vrais circuits dans
+[ngspice](https://ngspice.sourceforge.io/), avec les valeurs des schémas des vidéos. Les lignes marquées
+`[ngspice]` dans le rapport viennent de ce simulateur. Les circuits s'ouvrent aussi à la main :
+
+```bash
+cd ngspice
+ngspice tp10_ne555_fm.cir
+```
+
+Les circuits intégrés NE555, ICL8038 et LM565 n'ont pas de modèle SPICE officiel libre : `ngspice/modeles/`
+contient des modèles comportementaux construits d'après le schéma interne de leur fiche technique
+(comparateurs, bascule, sources de courant). Les transistors et diodes utilisent des modèles SPICE classiques.
 
 ## Lancer les simulations
 
@@ -41,7 +57,7 @@ Sur un ordinateur :
 
 ```bash
 pip install -r python/requirements.txt
-sudo apt-get install ngspice      # seulement pour le TP11
+sudo apt-get install ngspice      # pour les lignes [ngspice] (TP01, 07, 09, 10, 11)
 python python/run_all.py             # les 13 TP
 python python/run_all.py 10 11       # quelques TP
 ```
@@ -53,6 +69,8 @@ python/common.py      outils de mesure (fréquence, crêtes, SINAD, filtres)
 python/pam.py, pwm.py moteurs PAM et PWM partagés
 python/tpNN_*.py      une simulation par TP
 python/run_all.py     lance tout et écrit results/RAPPORT.md et results/resultats.json
-spice/                netlist ngspice du TP11 et modèles BC107B / 1N4001
+ngspice/              circuits ngspice des TP01, 07, 09, 10, 11
+ngspice/modeles/      modèles : transistors, diodes, NE555, ICL8038, LM565
+python/ngspice_outil.py  lance un circuit ngspice et lit ses courbes
 results/              rapport, figures et résultats JSON (écrits par GitHub Actions)
 ```

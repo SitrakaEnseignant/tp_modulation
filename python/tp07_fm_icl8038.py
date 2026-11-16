@@ -28,13 +28,13 @@ def run(outdir):
             "t1 = (5/3)·RA·C et t2 = (5/3)·RA·RB·C/(2RA − RB) : symétrique si RA = RB")
 
     # ---- VCO : f ∝ (V+ − V8), pour V+ − V8 = 0,2·Vs au repos (broches 7 et 8 reliées)
-    Vs = 12.0
+    Vs = 10.0   # alimentation du schéma de la vidéo
     d0 = 0.2 * Vs
     lignes = []
     for dv in (-1.0, -0.5, 0.0, 0.5, 1.0):
         f = f0 * (d0 - dv) / d0
         lignes.append([fr(dv), fmt(f, "Hz")])
-    r.tableaux.append(("Caractéristique du VCO prédite : f en fonction de la variation de V(broche 8) (V+ = 12 V)",
+    r.tableaux.append(("Caractéristique du VCO prédite : f en fonction de la variation de V(broche 8) (V+ = 10 V)",
                        ["ΔV broche 8 (V)", "f"], lignes))
     k = f0 / d0
     r.check("Sensibilité du VCO", "tableau V / f à compléter", f"K = f0/(0,2·Vs) = {fmt(k,'Hz')}/V", INFO,
@@ -58,7 +58,7 @@ def run(outdir):
             INDETERMINE, "la série E12 contient 6,8 kΩ ; cette résistance règle la polarisation FM, pas f0 (écart < 3 %)")
     _ngspice(r, f0, outdir)
     r.hypotheses += ["RA, RB et C réels non lisibles dans la vidéo : RA = RB = 10 kΩ, C = 1 nF supposés.",
-                     "Alimentation 12 V ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
+                     "Alimentation 10 V (schéma) ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
                      "VCO idéal et linéaire ; la fiche technique annonce une linéarité de l'ordre de 0,5 % sur une large plage."]
 
     fig, ax = nouvelle_figure(2, 2.6, "TP07 – ICL8038 en VCO : FM simulée (f0 = 30 kHz, m(t) = 0,5 V à 1 kHz)")

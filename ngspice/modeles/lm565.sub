@@ -23,7 +23,7 @@ Rs8 tr n8 1
 * seuils de C1 : référence ± 0,5 V
 Bhi rr vm V = 0.5*(1+tanh((v(tc,ref) - 0.5)/0.005))
 Blo s vm V = 0.5*(1+tanh((-0.5 - v(tc,ref))/0.005))
-Bq qi vm V = v(s,vm) + (1 - v(s,vm))*(1 - v(rr,vm))*v(qm,vm)
+Bq qi vm V = v(s,vm) + (1 - v(s,vm))*(1 - v(rr,vm))*0.5*(1+tanh((v(qm,vm)-0.5)/0.05))
 Rq qi qm 1k
 Cq qm vm 1p
 Bc vm tc I = (2*v(qm,vm) - 1)*v(tr,n8)*max(0.02, 1 + 50/(6.2832*v(vp,vm))*v(out,ref))

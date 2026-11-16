@@ -14,8 +14,8 @@ Rrs reset gnd 1MEG
 * comparateurs (sorties lissées entre 0 et 1)
 Bset s gnd V = 0.5*(1+tanh((0.5*v(cv,gnd) - v(trig,gnd))/0.005))
 Brst rr gnd V = 0.5*(1+tanh((v(thr,gnd) - v(cv,gnd))/0.005))
-* bascule RS : mémoire par une cellule RC de 1 ns
-Bq qi gnd V = v(s,gnd) + (1 - v(s,gnd))*(1 - v(rr,gnd))*v(qm,gnd)
+* bascule RS : mémoire par une cellule RC de 1 ns, avec réaction positive (états 0 ou 1 seulement)
+Bq qi gnd V = v(s,gnd) + (1 - v(s,gnd))*(1 - v(rr,gnd))*0.5*(1+tanh((v(qm,gnd)-0.5)/0.05))
 Rq qi qm 1k
 Cq qm gnd 1p
 * sortie (étage bipolaire)

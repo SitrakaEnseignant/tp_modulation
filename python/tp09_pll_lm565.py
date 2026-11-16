@@ -106,7 +106,7 @@ def _ngspice(r, f0_formule, outdir):
 
     # plage de verrouillage : porteuse pure décalée de f0
     lignes, limite = [], 0.0
-    for d in (1.5e3, 2.5e3, 3.0e3, 3.5e3, 4.5e3):
+    for d in (0.5e3, 1.0e3, 1.5e3, 2.0e3, 3.0e3):
         ok_pm = []
         for sgn in (+1, -1):
             fin = f_libre[0] + sgn * d
@@ -116,12 +116,16 @@ def _ngspice(r, f0_formule, outdir):
         verrou = all(ok_pm)
         if verrou:
             limite = d
-        lignes.append([f"± {fmt(d,'Hz')}", "verrouillée" if verrou else "décrochée"])
-    r.tableaux.append(("ngspice : la boucle suit-elle une porteuse pure décalée de f0 ?",
+        lignes.append([f"± {fmt(d,'Hz')}", "accrochée" if verrou else "non accrochée"])
+    r.tableaux.append(("ngspice : la boucle s'accroche-t-elle sur une porteuse pure décalée de f0 (départ décroché) ?",
                        ["Écart à f0", "Boucle"], lignes))
     fl = 8 * f0_formule / 24
-    r.check("[ngspice] Plage de verrouillage simulée", f"fiche technique : ±8·f0/Vc = ±{fmt(fl,'Hz')}",
-            f"verrouillée jusqu'à ±{fmt(limite,'Hz')} au moins", CONFIRME if 0.6 * fl <= limite <= 1.5 * fl else INDETERMINE)
+    tau = 3.6e3 * 151e-9
+    fcap = np.sqrt(2 * np.pi * fl / tau) / (2 * np.pi)
+    r.check("[ngspice] Plage de capture simulée", f"estimation √(2π·fL/τ)/2π = ±{fmt(fcap,'Hz')}",
+            f"accrochage jusqu'à ±{fmt(limite,'Hz')}", CONFIRME if 0.5 * fcap <= limite <= 2 * fcap else INDETERMINE,
+            f"la plage de verrouillage (boucle déjà accrochée) est plus large : ±{fmt(fl,'Hz')} d'après la fiche technique. "
+            "Avec C2 = 150 nF, la porteuse doit être réglée à moins d'environ 1 kHz de f0 pour que la boucle s'accroche.")
     r.doute("C1 relié à la masse (vidéo) ou à −12 V (fiche technique) ?", REDUIT,
             f"Avec des alimentations stables, ngspice donne la même fréquence ({fmt(f_libre[0],'Hz')} et {fmt(f_libre[1],'Hz')}). "
             "La fiche technique préfère −V pour que le condensateur suive les variations de l'alimentation ; "
