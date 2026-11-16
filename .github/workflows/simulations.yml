@@ -1,0 +1,66 @@
+name: Simulations des TP de modulation
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "results/**"
+  workflow_dispatch:
+    inputs:
+      tps:
+        description: "Numéros des TP à simuler (vide = les 13), ex. « 1 10 11 »"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  simulations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installer les bibliothèques Python
+        run: pip install -r requirements.txt
+
+      - name: Installer ngspice (simulation SPICE du TP11)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ngspice
+          ngspice --version | head -2
+
+      - name: Lancer les simulations
+        run: python sim/run_all.py ${{ github.event.inputs.tps }}
+
+      - name: Afficher le rapport dans le résumé de l'exécution
+        if: always()
+        run: |
+          if [ -f results/RAPPORT.md ]; then
+            grep -v '^!\[' results/RAPPORT.md | grep -v '^\*[^*].*\*$' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Conserver les résultats (artefact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultats-simulations
+          path: results/
+
+      - name: Enregistrer les résultats dans le dépôt
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results
+          if git diff --cached --quiet; then
+            echo "Aucun changement dans les résultats."
+          else
+            git commit -m "Résultats des simulations (${GITHUB_SHA::7}) [skip ci]"
+            git push
+          fi

@@ -1,0 +1,8 @@
+* Modèles SPICE génériques utilisés par les simulations (paramètres publiés couramment)
+* BC107B : petit transistor NPN (paramètres de type BC107B/BC547B)
+.model BC107B NPN(IS=1.8E-14 ISE=5.0E-14 NF=.9955 NE=1.46 BF=400 BR=35.5 IKF=.14 IKR=.03
++ ISC=1.72E-13 NC=1.27 NR=1.005 RB=.56 RE=.6 RC=.25 VAF=80 VAR=12.5 CJE=13E-12 TF=.64E-9
++ CJC=4E-12 TR=50.72E-9 VJC=.54 MJC=.33)
+* 1N4001 : diode de redressement
+.model D1N4001 D(IS=14.11N N=1.984 RS=33.89M IKF=94.81 XTI=3 EG=1.11 CJO=25.89P M=.44
++ VJ=.3245 FC=.5 BV=75 IBV=10U TT=5.7U)
