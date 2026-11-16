@@ -17,8 +17,8 @@ DETECTEURS = {
     "aucun": ("", "v(c)"),
     # démodulateur branché directement sur le collecteur (sans condensateur de liaison)
     "direct": ("D1 c out D1N4001\nC2 out 0 1u\nR5 out 0 500", "v(out)"),
-    # démodulateur branché à travers un condensateur de liaison de 1 µF
-    "liaison": ("CK c din 1u\nRK din 0 10k\nD1 din out D1N4001\nC2 out 0 1u\nR5 out 0 500", "v(out)"),
+    # même branchement, mais R5 = 10 kΩ et C2 = 47 nF (même constante de temps ≈ 0,5 ms)
+    "r5_10k": ("D1 c out D1N4001\nC2 out 0 47n\nR5 out 0 10k", "v(out)"),
 }
 
 
@@ -89,10 +89,13 @@ def run(outdir):
             "crêtes de chaque cycle de porteuse sur 10 ms ; dépend du transistor et de la résistance de L1")
     r.check("Taux de modulation μ (formule de la vidéo, tensions absolues)", "≈ 0,03", f"μ = {fr(mu_s)}",
             CONFIRME if abs(mu_s - 0.035) < 0.03 else INDETERMINE,
-            "même ordre de grandeur que la vidéo : le montage module très peu" if abs(mu_s - 0.035) < 0.03 else
+            "la simulation retrouve la valeur de la vidéo avec un BC107 : le transistor de remplacement n'est pas nécessaire "
+            "pour l'expliquer ; la valeur faible vient surtout de la tension continue (ligne suivante)" if abs(mu_s - 0.035) < 0.03 else
             "écart avec la vidéo : le transistor de remplacement et le réglage réel expliquent la différence")
-    r.check("μ calculé sur la seule partie alternative", "—", f"μ = {fr(mu_ac)}", INFO,
-            f"en retirant la tension continue du collecteur ({fmt(vdc,'V')}) ; c'est la définition correcte de μ")
+    r.check("μ calculé sur la seule partie alternative", "0,129 en corrigeant les valeurs de la vidéo",
+            f"μ = {fr(mu_ac)}", CONFIRME if abs(mu_ac - mu_corr) < 0.03 else INDETERMINE,
+            f"en retirant la tension continue du collecteur ({fmt(vdc,'V')}) : c'est la définition correcte de μ. "
+            "Le vrai taux de modulation est ≈ 13 %, pas 3 %.")
     t12, vc12, _ = lance_spice(12.0, 4.5, detecteur="aucun")
     e12 = mesure(t12, vc12, vc12)
     r.check("Même modulateur sous 12 V (valeur du schéma)", "—",
@@ -101,17 +104,17 @@ def run(outdir):
     # 2) démodulateur branché directement sur le collecteur
     td, vcd, vod = lance_spice(8.3, 4.5, detecteur="direct")
     ed = mesure(td, vcd, vod)
-    r.check("Démodulateur branché directement sur le collecteur", "« Input for Demodulator » : circuit séparé",
-            f"tension continue de sortie {fmt(float(np.mean(ed[4])),'V')} ; message {fmt(ed[7],'V')} crête",
-            ECART,
-            "Sans condensateur de liaison, un courant continu passe par L1, D1 et R5 (≈ 14 mA) : R5 = 500 Ω charge "
-            "le circuit accordé et écrase la modulation. Il faut un condensateur de liaison entre la sortie AM et D1.")
-    # 3) avec condensateur de liaison
-    tl, vcl, vol = lance_spice(8.3, 4.5, detecteur="liaison")
+    r.check("Démodulateur du schéma (R5 = 500 Ω) branché sur la sortie AM", "« Input for Demodulator » : circuit séparé",
+            f"tension continue {fmt(float(np.mean(ed[4])),'V')} ; message {fmt(ed[7],'V')} crête", ECART,
+            "R5 = 500 Ω est très faible devant l'impédance du circuit accordé (≈ 3 kΩ à 10 kHz) : environ 14 mA "
+            "traversent L1, D1 et R5, le circuit accordé est écrasé et le message récupéré devient très petit.")
+    # 3) même détecteur avec R5 = 10 kΩ et C2 = 47 nF
+    tl, vcl, vol = lance_spice(8.3, 4.5, detecteur="r5_10k")
     el = mesure(tl, vcl, vol)
-    r.check("Démodulateur avec condensateur de liaison 1 µF", "sinus de 500 Hz observé",
+    r.check("Détecteur avec R5 = 10 kΩ et C2 = 47 nF (même RC)", "sinus de 500 Hz observé",
             f"message {fmt(el[7],'V')} crête à 500 Hz", INFO,
-            "comparer avec le branchement direct : le message récupéré est plus net")
+            f"{fr(el[7]/max(ed[7],1e-9),2)} fois plus grand qu'avec 500 Ω : une résistance de charge plus élevée "
+            "(ou un étage tampon) est nécessaire")
     tt_d, vo_d = ed[2], ed[4]
     tt_l, vo_l = el[2], el[4]
     r.hypotheses += ["Modèles génériques BC107B et 1N4001 : le transistor réellement utilisé dans la vidéo n'est pas connu.",
@@ -122,9 +125,9 @@ def run(outdir):
     ax[0].plot((tt - tt[0]) * 1e3, v, lw=0.4); ax[0].plot((tp - tt[0]) * 1e3, pk, ".", ms=2)
     ax[0].set_title(f"Collecteur, modulateur seul : Emax = {fmt(emax,'V')}, Emin = {fmt(emin,'V')}", fontsize=9)
     ax[1].plot((tt_d - tt_d[0]) * 1e3, vo_d, lw=1)
-    ax[1].set_title("Sortie du détecteur branché directement sur le collecteur", fontsize=9)
+    ax[1].set_title("Sortie du détecteur du schéma (R5 = 500 Ω, C2 = 1 µF)", fontsize=9)
     ax[2].plot((tt_l - tt_l[0]) * 1e3, vo_l, lw=1)
-    ax[2].set_title("Sortie du détecteur avec condensateur de liaison", fontsize=9)
+    ax[2].set_title("Sortie du détecteur avec R5 = 10 kΩ et C2 = 47 nF", fontsize=9)
     for a_ in ax:
         a_.set_xlabel("t (ms)")
     sauve(fig, r, outdir, "tp11_am_spice.png", "Modulateur AM à BC107 simulé avec ngspice")
