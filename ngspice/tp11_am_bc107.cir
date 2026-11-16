@@ -1,7 +1,13 @@
 * TP11 - Modulateur AM a transistor BC107 et detecteur d'enveloppe (valeurs du schema de la video)
-* Ce fichier est un gabarit : python/tp11_am_bc107.py remplace les champs entre accolades.
-.include modeles.lib
-VCC vcc 0 DC {VCC}
+* Les lignes .param peuvent etre modifiees par python/ngspice_outil.py
+* Detecteur sans effet : R5V = 1T et C2V = 1p
+.include modeles/composants.lib
+.param VALIM=8.3
+.param AMSG=4.5
+.param RL=50
+.param R5V=500
+.param C2V=1u
+VCC vcc 0 DC {VALIM}
 * porteuse 15 V crete, 10 kHz, appliquee a la base par R1
 VCAR car 0 SIN(0 15 10k)
 R1 car b 1k
@@ -16,13 +22,15 @@ VMSG em 0 SIN(0 {AMSG} 500)
 L1 vcc nl 50m
 RL nl c {RL}
 C1 vcc c 10n
-* detecteur d'enveloppe (D1 1N4001G, C2 = 1 uF, R5 = 500 ohms) : branchement choisi par le script
-{DETECTEUR}
+* detecteur d'enveloppe (D1 1N4001G, C2 = 1 uF, R5 = 500 ohms)
+D1 c out D1N4001
+C2 out 0 {C2V}
+R5 out 0 {R5V}
 .options reltol=1e-4
 .tran 0.5u 30m 0 0.5u
 .control
 run
-wrdata {OUT} v(c) {SONDE}
+wrdata sortie.txt v(c) v(out)
 quit
 .endc
 .end

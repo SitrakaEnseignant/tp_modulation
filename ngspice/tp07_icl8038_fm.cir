@@ -1,0 +1,30 @@
+* TP07 - Modulateur FM a ICL8038 (schema de la video)
+* RA et RB ne sont pas lisibles dans la video : 10 kohm supposes ; C = 0,001 uF ; V+ = 10 V
+* Message m(t) applique a la broche 8 par 10 uF ; 6,6 kohm entre les broches 7 et 8
+.include modeles/icl8038.sub
+.param RAV=10k
+.param RBV=10k
+.param RFM=6.6k
+.param AMSG=0
+.param FMSG=500
+.param TSTOP=2m
+VP vp 0 DC 10
+*  SINE TRI RA RB V+ BIAS SWEEP SQ C V- ADJ
+X1 sine tri ra rb vp bias sweep sq c 0 adj ICL8038
+RA vp ra {RAV}
+RB vp rb {RBV}
+C c 0 1n
+RL vp sq 10k
+R12 adj 0 82k
+RFM sweep bias {RFM}
+C10 sweep msg 10u
+VMSG msg 0 SIN(0 {AMSG} {FMSG})
+.ic v(sweep)=8 v(bias)=8 v(c)=3.4
+.options method=gear reltol=1e-4
+.tran 0.05u {TSTOP} 0 0.05u uic
+.control
+run
+wrdata sortie.txt v(sq) v(tri) v(sweep)
+quit
+.endc
+.end

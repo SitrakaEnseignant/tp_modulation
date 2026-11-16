@@ -23,6 +23,11 @@ ECART = "ÉCART"                # la simulation contredit la valeur de la vidéo
 INDETERMINE = "À VÉRIFIER"     # le résultat dépend d'une hypothèse non connue
 INFO = "INFO"                  # valeur prédite (tableau vide dans la vidéo)
 
+# Statuts d'un doute
+LEVE = "levé"
+REDUIT = "réduit"
+RESTE = "reste"
+
 LIENS = {
     1: "YkTwZO9ub90", 2: "D5Se6hQdWQA", 3: "vzdANFkMhSQ", 4: "MSSf-RjRAB4",
     5: "MGXgkWwaYSs", 6: "Q6VduGGqPRE", 7: "eaoYraDUfKk", 8: "eeunlmRM_LA",
@@ -49,9 +54,13 @@ class Resultat:
     hypotheses: list = field(default_factory=list)
     figures: list = field(default_factory=list)
     tableaux: list = field(default_factory=list)   # (titre, entêtes, lignes)
+    doutes: list = field(default_factory=list)     # {doute, statut, explication}
 
     def check(self, nom, video, simulation, statut, commentaire=""):
         self.checks.append(Check(nom, str(video), str(simulation), statut, commentaire))
+
+    def doute(self, doute, statut, explication):
+        self.doutes.append({"doute": doute, "statut": statut, "explication": explication})
 
     def to_dict(self):
         d = asdict(self)

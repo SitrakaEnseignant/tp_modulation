@@ -1,0 +1,34 @@
+* TP09 - Demodulation FM par PLL LM565 (schema de la video)
+* R1 = 6,8 kohm, C1 = 4,7 nF, 1 nF entre les broches 7 et 8, C2 = 150 nF (broche 7 a la masse)
+* Entree FM par 10 uF, 600 ohms sur les broches 2 et 3 ; alimentation +/-12 V
+* C1BAS = 0 : C1 relie a la masse (video) ; C1BAS = 1 : C1 relie a -V (fiche technique)
+.include modeles/lm565.sub
+.param VALIM=12
+.param FC=9.4k
+.param MDI=1
+.param FMOD=1k
+.param TSTOP=20m
+.param C1BAS=0
+.param VA=4.25
+VP vp 0 DC {VALIM}
+VM vm 0 DC {-VALIM}
+*  -V IN1 IN2 VCO PDIN REF OUT R1 C1 +V
+X1 vm in1 in2 vco vco ref out tr tc vp LM565
+R1 vp tr 6.8k
+C1 tc c1b 4.7n
+VC1 c1b 0 DC {-VALIM*C1BAS}
+C78 out tr 1n
+C2 out 0 150n
+CIN in1 src 10u
+RIN1 in1 0 600
+RIN2 in2 0 600
+VIN src 0 SFFM(0 {VA} {FC} {MDI} {FMOD})
+.ic v(tc)=0 v(out)=0 v(in1)=0
+.options method=gear reltol=1e-4
+.tran 0.2u {TSTOP} 0 0.2u uic
+.control
+run
+wrdata sortie.txt v(out) v(tc) v(vco)
+quit
+.endc
+.end

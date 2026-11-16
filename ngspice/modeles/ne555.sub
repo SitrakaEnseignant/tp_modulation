@@ -1,0 +1,28 @@
+* NE555 : modèle comportemental construit d'après le schéma interne de la fiche technique
+* - pont interne 3 × 5 kΩ entre VCC et GND (broche 5 = CV au premier tiers haut)
+* - comparateur haut : seuil (broche 6) > V(CV)        -> remise à zéro
+* - comparateur bas  : déclenchement (broche 2) < V(CV)/2 -> mise à un
+* - bascule RS, transistor de décharge (broche 7), sortie bipolaire (niveau haut ≈ VCC − 1,7 V)
+* Ordre des broches : 1 GND, 2 TRIG, 3 OUT, 4 RESET, 5 CV, 6 THR, 7 DIS, 8 VCC
+.subckt NE555 gnd trig out reset cv thr dis vcc
+R1 vcc cv 5k
+R2 cv nb 5k
+R3 nb gnd 5k
+Rtr trig gnd 100MEG
+Rth thr gnd 100MEG
+Rrs reset gnd 1MEG
+* comparateurs (sorties lissées entre 0 et 1)
+Bset s gnd V = 0.5*(1+tanh((0.5*v(cv,gnd) - v(trig,gnd))/0.005))
+Brst rr gnd V = 0.5*(1+tanh((v(thr,gnd) - v(cv,gnd))/0.005))
+* bascule RS : mémoire par une cellule RC de 1 ns
+Bq qi gnd V = v(s,gnd) + (1 - v(s,gnd))*(1 - v(rr,gnd))*v(qm,gnd)
+Rq qi qm 1k
+Cq qm gnd 1p
+* sortie (étage bipolaire)
+Bout oi gnd V = v(qm,gnd)*(v(vcc,gnd) - 1.7)
+Rout oi out 10
+* transistor de décharge : conduit quand la sortie est basse
+Bqn qn gnd V = 1 - v(qm,gnd)
+S7 dis gnd qn gnd SDIS
+.model SDIS SW(VT=0.5 VH=0.05 RON=15 ROFF=1G)
+.ends NE555

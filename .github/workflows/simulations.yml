@@ -30,7 +30,7 @@ jobs:
       - name: Installer les bibliothèques Python
         run: pip install -r python/requirements.txt
 
-      - name: Installer ngspice (simulation SPICE du TP11)
+      - name: Installer ngspice (TP01, TP07, TP09, TP10, TP11)
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q ngspice

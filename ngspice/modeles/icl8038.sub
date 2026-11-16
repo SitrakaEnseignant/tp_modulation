@@ -1,0 +1,34 @@
+* ICL8038 : modèle comportemental construit d'après le schéma interne de la fiche technique (Intersil)
+* - broches 4 et 5 suivent la tension de la broche 8 : courants I_A = (V+ − V8)/RA et I_B = (V+ − V8)/RB
+* - charge du condensateur (broche 10) par I_A, décharge par 2·I_B − I_A
+* - comparateurs à 2/3 et 1/3 de l'alimentation, bascule
+* - broche 7 (polarisation FM) : pont interne qui la place à 0,2·Vs sous V+
+* - broche 9 : sortie carrée à collecteur ouvert ; broche 3 : triangle ; broche 2 : sinus (conformateur)
+* Ordre des broches : 2 SINUS, 3 TRIANGLE, 4 RA, 5 RB, 6 V+, 7 FM BIAS, 8 FM SWEEP, 9 CARRÉ, 10 C, 11 V−, 12 RÉGLAGE
+.subckt ICL8038 sine tri ra rb vp bias sweep sq c vm adj
+R7a vp bias 8k
+R7b bias vm 32k
+Rsw sweep vm 100MEG
+Radj adj vm 1MEG
+* broches 4 et 5 recopient la tension de la broche 8 (mesure du courant par V4s et V5s)
+E4 a4 vm sweep vm 1
+V4s ra a4 0
+E5 a5 vm sweep vm 1
+V5s rb a5 0
+* comparateurs et bascule
+Bhi rr vm V = 0.5*(1+tanh((v(c,vm) - 2/3*v(vp,vm))/0.005))
+Blo s vm V = 0.5*(1+tanh((1/3*v(vp,vm) - v(c,vm))/0.005))
+Bq qi vm V = v(s,vm) + (1 - v(s,vm))*(1 - v(rr,vm))*v(qm,vm)
+Rq qi qm 1k
+Cq qm vm 1p
+* courant du condensateur (les sources de courant internes ne peuvent pas s'inverser)
+Bc vm c I = v(qm,vm)*max(i(V4s),0) - (1 - v(qm,vm))*max(2*i(V5s) - i(V4s),0)
+* sortie carrée à collecteur ouvert : basse pendant la décharge
+Bqn qn vm V = 1 - v(qm,vm)
+S9 sq vm qn vm S9MOD
+.model S9MOD SW(VT=0.5 VH=0.05 RON=50 ROFF=1G)
+* triangle et sinus
+E3 tri vm c vm 1
+Bsin si vm V = 0.5*v(vp,vm) + 0.22*v(vp,vm)*sin(1.5708*(v(c,vm) - 0.5*v(vp,vm))/(v(vp,vm)/6))
+Rsin si sine 1k
+.ends ICL8038

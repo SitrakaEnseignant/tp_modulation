@@ -64,6 +64,14 @@ def main(selection):
         synth.append([f"TP{r['tp']:02d}", r["titre"], cnt[CONFIRME], cnt[ECART], cnt[INDETERMINE], cnt[INFO]])
     L += ["## Synthèse", "", md_table(["TP", "Sujet", "✅", "❌", "⚠️", "ℹ️"], synth), "",
           f"**Total : {tot[CONFIRME]} confirmés, {tot[ECART]} écarts, {tot[INDETERMINE]} à vérifier, {tot[INFO]} valeurs prédites.**", ""]
+    ICD = {"levé": "🟢 levé", "réduit": "🟡 réduit", "reste": "🔴 reste"}
+    dl = [[f"TP{r['tp']:02d}", d["doute"], ICD.get(d["statut"], d["statut"]), d["explication"]]
+          for r in tous for d in r.get("doutes", [])]
+    if dl:
+        nb = {k: sum(1 for x in dl if x[2] == v) for k, v in ICD.items()}
+        L += ["## Doutes du cours et résultat des simulations", "",
+              f"{nb['levé']} doutes levés, {nb['réduit']} réduits, {nb['reste']} restent ouverts.", "",
+              md_table(["TP", "Doute", "Résultat", "Explication"], dl), ""]
     if erreurs:
         L += ["## Erreurs d'exécution", ""] + [f"- TP{n:02d} : voir le journal GitHub Actions" for n, _ in erreurs] + [""]
     for r in tous:

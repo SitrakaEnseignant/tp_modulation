@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import signal, optimize
 
-from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr, nouvelle_figure, sauve
+from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr, nouvelle_figure, sauve
 
 TITRE = "PWM – Akademika DCL-08 (caractéristique largeur / tension, déphasage)"
 V = np.array([0.6, 1.4, 2.4, 3.3, 4.2])
@@ -46,6 +46,10 @@ def run(outdir):
                        ["message", "déphasage", "filtre ordre 1", "Butterworth ordre 2", "Butterworth ordre 4"], lignes))
     r.check("Déphasage du signal démodulé", "0,6 × 250 µs = 150 µs", f"{fmt(dt,'s')} = {fr(360*1000*dt)}° à 1 kHz",
             CONFIRME, "valeur cohérente avec un filtre de démodulation de quelques kHz (voir tableau)")
+    r.doute("Unité « secs » de la colonne largeur", REDUIT,
+            "Des largeurs de 0,2 s sont impossibles avec l'horloge de la maquette : ce sont très probablement des ms.")
+    r.doute("Fréquence du message pendant la mesure du déphasage", RESTE,
+            "500 Hz ou 1 kHz : les deux cas sont calculés, le filtre correspondant est le même (≈ 1,6 kHz à l'ordre 2).")
     r.hypotheses += ["La fréquence du message pendant la mesure de déphasage (500 Hz ou 1 kHz) n'est pas certaine : les deux cas sont donnés."]
 
     fig, ax = nouvelle_figure(1, 3.2, "TP06 – Largeur d'impulsion en fonction de la tension continue")

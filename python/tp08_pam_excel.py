@@ -1,7 +1,7 @@
 """TP08 – PAM, maquette Excel Technologies (source AF 1 kHz, horloge 8 kHz)."""
 import numpy as np
 
-from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr, nouvelle_figure, sauve
+from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr, nouvelle_figure, sauve
 import pam
 
 TITRE = "PAM – maquette Excel Technologies (1 kHz / 8 kHz)"
@@ -33,6 +33,8 @@ def run(outdir):
             "alimenté en unipolaire (écrêtage) ou si le message porte un décalage continu. À vérifier sur la maquette.")
     *_, sd = pam.essai(fm, fs, "naturel", 0.5, 3.4e3, 4)
     r.check("Message récupéré après filtre (cas idéal)", "démodulation non montrée", f"SINAD {pam.txt_sinad(sd)}", INFO)
+    r.doute("« Seule l'alternance positive apparaît »", RESTE,
+            "Une horloge 0/1 ne suffit pas à l'expliquer ; cela dépend du montage interne de la maquette (non publié).")
     r.hypotheses += ["Rapport cyclique 50 % ; filtre Butterworth d'ordre 4 à 3,4 kHz pour la démodulation."]
 
     fig, ax = nouvelle_figure(3, 2.3, "TP08 – PAM 1 kHz / 8 kHz : rôle de l'horloge unipolaire")

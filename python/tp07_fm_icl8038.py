@@ -1,7 +1,9 @@
 """TP07 – Modulation de fréquence avec l'ICL8038."""
 import numpy as np
 
-from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr, ecart_pct, periodes_cycle, nouvelle_figure, sauve
+from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr, ecart_pct,
+                    periodes_cycle, nouvelle_figure, sauve)
+import ngspice_outil as ng
 
 TITRE = "FM avec le générateur de fonctions ICL8038"
 
@@ -54,6 +56,7 @@ def run(outdir):
             "valeurs prédites pour remplir le tableau ; Δf = K·Am")
     r.check("Valeur 6,6 kΩ entre les broches 7 et 8", "lue 6,6 kΩ (peut-être 6,8 kΩ)", "6,6 kΩ n'est pas une valeur normalisée",
             INDETERMINE, "la série E12 contient 6,8 kΩ ; cette résistance règle la polarisation FM, pas f0 (écart < 3 %)")
+    _ngspice(r, f0, outdir)
     r.hypotheses += ["RA, RB et C réels non lisibles dans la vidéo : RA = RB = 10 kΩ, C = 1 nF supposés.",
                      "Alimentation 12 V ; broches 7 et 8 au repos à 0,2·Vs sous V+ (fiche technique).",
                      "VCO idéal et linéaire ; la fiche technique annonce une linéarité de l'ordre de 0,5 % sur une large plage."]
@@ -65,3 +68,55 @@ def run(outdir):
     ax[1].set_title("Fréquence de chaque cycle", fontsize=9)
     sauve(fig, r, outdir, "tp07_fm.png", "ICL8038 utilisé comme VCO")
     return r
+
+
+def _freqs(t, sq, debut):
+    sel = t > debut
+    tc, per = periodes_cycle(sq[sel], t[sel], 0.5 * (sq.max() + sq.min()))
+    return tc, 1 / per
+
+
+def _ngspice(r, f0_formule, outdir):
+    if not ng.disponible():
+        r.check("[ngspice] Simulation du montage", "—", "ngspice absent sur cette machine", INDETERMINE,
+                "la simulation tourne dans GitHub Actions")
+        return
+    t, (sq, tri, v8) = ng.lance("tp07_icl8038_fm.cir", pas=0.05e-6, AMSG=0, TSTOP="0.6m")
+    _, f = _freqs(t, sq, 0.2e-3)
+    f0 = float(np.median(f))
+    r.check("[ngspice] Fréquence libre (RA = RB = 10 kΩ, C = 1 nF, 10 V)", "≈ 30 kHz (formule)", fmt(f0, "Hz", 4),
+            CONFIRME if abs(ecart_pct(f0, f0_formule)) < 5 else ECART,
+            "modèle comportemental construit d'après le schéma interne de la fiche technique")
+    res = {}
+    for rfm in ("6.6k", "6.8k"):
+        t, (sq, tri, v8) = ng.lance("tp07_icl8038_fm.cir", pas=0.05e-6, AMSG=0.5, RFM=rfm, TSTOP="5m")
+        tc, f = _freqs(t, sq, 1e-3)
+        res[rfm] = (f.min(), f.max(), tc, f, t, v8)
+    a, b = res["6.6k"], res["6.8k"]
+    r.check("[ngspice] 6,6 kΩ ou 6,8 kΩ entre les broches 7 et 8 (m(t) = 0,5 V crête)", "valeur lue douteuse",
+            f"6,6 kΩ : {fmt(a[0],'Hz')} à {fmt(a[1],'Hz')} ; 6,8 kΩ : {fmt(b[0],'Hz')} à {fmt(b[1],'Hz')}",
+            CONFIRME if abs(ecart_pct(a[1], b[1])) < 1 and abs(ecart_pct(a[0], b[0])) < 1 else ECART,
+            "le générateur impose la tension de la broche 8 à travers 10 µF : la résistance ne change pas la fréquence")
+    t, (sq, tri, v8) = ng.lance("tp07_icl8038_fm.cir", pas=0.05e-6, AMSG=2, TSTOP="5m")
+    tc4, f4 = _freqs(t, sq, 1e-3)
+    r.check("[ngspice] Message de la vidéo : 4 Vpp à 500 Hz sur la broche 8", "fmax, fmin à mesurer",
+            f"fréquence de {fmt(f4.min(),'Hz')} à {fmt(f4.max(),'Hz')}", INFO,
+            "Au repos V+ − V8 = 2 V ; avec 2 V crête, cet écart varie de 0 à 4 V : la fréquence descend presque à zéro "
+            "sur une alternance et double sur l'autre. C'est une modulation très forte et non linéaire.")
+    r.doute("Résistance entre les broches 7 et 8 : 6,6 kΩ ou 6,8 kΩ ?", LEVE,
+            "La valeur ne change pas la fréquence : la broche 8 est imposée par le générateur à travers 10 µF. "
+            "6,8 kΩ (valeur normalisée) est le plus probable, sans effet sur les mesures.")
+    r.doute("Valeurs de RA et RB (illisibles)", RESTE,
+            "f0 est inversement proportionnelle à RA et RB : la simulation ne peut pas les retrouver sans une mesure de f0.")
+    r.doute("Amplitude du message 4 Vpp", REDUIT,
+            "Avec 10 V d'alimentation, 4 Vpp sur la broche 8 surmodule le VCO (fréquence proche de zéro au sommet). "
+            "Pour une FM linéaire, il faut quelques centaines de mV.")
+    fig, ax = nouvelle_figure(2, 2.6, "TP07 – ngspice : ICL8038 en VCO (RA = RB = 10 kΩ, C = 1 nF)")
+    ax[0].plot(a[2] * 1e3, a[3] / 1e3, ".", ms=2, label="6,6 kΩ"); ax[0].plot(b[2] * 1e3, b[3] / 1e3, ".", ms=1, label="6,8 kΩ")
+    ax[0].set_title("Message 0,5 V crête : les deux résistances donnent la même fréquence", fontsize=9)
+    ax[0].set_ylabel("kHz"); ax[0].legend(fontsize=7)
+    ax[1].plot(tc4 * 1e3, f4 / 1e3, ".", ms=2); ax[1].set_title("Message 4 Vpp (vidéo) : surmodulation", fontsize=9)
+    ax[1].set_ylabel("kHz")
+    for a_ in ax:
+        a_.set_xlabel("t (ms)")
+    sauve(fig, r, outdir, "tp07_icl8038_ngspice.png", "Fréquence instantanée de l'ICL8038 simulé dans ngspice")

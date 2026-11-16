@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import signal
 
-from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr,
+from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr,
                     periodes_cycle, sinad_db, passe_bas, spectre, nouvelle_figure, sauve)
 
 TITRE = "FM – maquette FM Modulation & Demodulation (VCO + PLL)"
@@ -68,6 +68,12 @@ def run(outdir):
     sel = slice(int(0.5e-3 * fs), -int(0.1e-3 * fs))
     sd = sinad_db(dem[sel], t[1:][sel], fm)
     r.check("Démodulation : message récupéré à 5 kHz", "message récupéré montré (TP4)", f"SINAD {fr(sd)} dB", CONFIRME)
+    r.doute("fmin écrit 55 kHz sur la feuille", LEVE, "1/38 µs = 26,3 kHz : erreur de recopie.")
+    r.doute("Lecture de 3,8 div pour fmin", RESTE,
+            "Un VCO symétrique donnerait ≈ 2,8 div ; le circuit interne de la maquette n'étant pas publié, "
+            "seule une nouvelle mesure peut trancher.")
+    r.doute("Valeurs dites à l'oral différentes du tableau final", RESTE,
+            "La transcription automatique n'est pas fiable ; le tableau final reste la référence.")
     r.hypotheses += [
         "VCO idéal et linéaire ; le circuit interne de la maquette n'est pas connu.",
         "Le démodulateur PLL de la maquette est remplacé par un discriminateur de phase idéal (même résultat pour un PLL verrouillé).",

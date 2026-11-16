@@ -2,7 +2,9 @@
 import math
 import numpy as np
 
-from common import Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr, ecart_pct, nouvelle_figure, sauve
+from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr, ecart_pct,
+                    periodes_cycle, nouvelle_figure, sauve)
+import ngspice_outil as ng
 
 TITRE = "FM avec un NE555 (astable, message sur la broche 5)"
 VCC = 5.0
@@ -105,6 +107,7 @@ def run(outdir):
             "broche 5 plus haute → seuils plus hauts → charge plus longue → fréquence plus basse", CONFIRME)
     r.check("Linéarité", "—", "Δf asymétrique : la charge ralentit fortement quand Vcv approche Vcc − 0,6 V", INFO,
             "avec 1,5 V crête autour de 2,5 V, la broche 5 monte à 4 V : le 555 est très non linéaire ; un message plus faible serait plus fidèle")
+    _ngspice(r, f_libre, duty, outdir)
     r.hypotheses += ["Pont interne 5 kΩ / 5 kΩ / 5 kΩ du 555 ; transistor de décharge saturé à 0,1 V.",
                      "Diode 1N4007 : Is = 7 nA, n = 1,8 ; sortie du générateur idéale."]
 
@@ -119,3 +122,50 @@ def run(outdir):
     ax[1].set_xlabel("t (ms)"); ax[1].set_ylabel("kHz"); ax[1].set_title("Fréquence de chaque cycle, message 200 Hz 3 Vpp (C1 = 0,1 µF)", fontsize=9)
     sauve(fig, r, outdir, "tp10_555.png", "Astable 555 et fréquence instantanée modulée")
     return r
+
+
+def _ngspice(r, f_py, duty_py, outdir):
+    """Même montage simulé dans ngspice (modèle NE555 + diode 1N4007 SPICE)."""
+    if not ng.disponible():
+        r.check("[ngspice] Simulation du montage", "—", "ngspice absent sur cette machine", INDETERMINE,
+                "la simulation tourne dans GitHub Actions")
+        return
+
+    def libre(c1):
+        t, (vo, vc, vcv) = ng.lance("tp10_ne555_fm.cir", pas=0.1e-6, C1VAL=c1, AMSG=0, TSTOP="3m")
+        sel = t > 1e-3
+        tc, per = periodes_cycle(vo[sel], t[sel], 0.5 * vo.max())
+        return 1 / per.mean(), float(np.mean(vo[sel] > 0.5 * vo.max())), float(vo.max()), t, vo, vc
+
+    f1, d1, vh, t, vo, vc = libre("0.1u")
+    r.check("[ngspice] Fréquence sans message (C1 = 0,1 µF)", "≈ 11 kHz", fmt(f1, "Hz"), ECART,
+            f"même résultat que la simulation Python ({fmt(f_py,'Hz')}) avec un autre simulateur et une vraie diode SPICE")
+    r.check("[ngspice] Rapport cyclique", "« charge et décharge égales »", f"{fr(100*d1)} %",
+            CONFIRME if 40 < 100 * d1 < 60 else ECART, f"Python : {fr(100*duty_py)} %")
+    r.check("[ngspice] Niveau haut de la sortie", "≈ 5,4 V", fmt(vh, "V"), ECART,
+            "un NE555 bipolaire sous 5 V ne peut pas sortir 5,4 V")
+    f47, *_ = libre("47n")
+    r.check("[ngspice] Fréquence avec C1 = 47 nF", "≈ 11 kHz", fmt(f47, "Hz"),
+            CONFIRME if abs(ecart_pct(f47, 11e3)) < 10 else ECART)
+    t2, (vo2, vc2, vcv2) = ng.lance("tp10_ne555_fm.cir", pas=0.2e-6, C1VAL="0.1u", AMSG=1.5, TSTOP="15m")
+    sel = t2 > 5e-3
+    tc, per = periodes_cycle(vo2[sel], t2[sel], 0.5 * vo2.max())
+    fmin, fmax = 1 / per.max(), 1 / per.min()
+    r.check("[ngspice] FM avec message 200 Hz, 3 Vpp (C1 = 0,1 µF)", "fmin / fmax à mesurer",
+            f"fmin = {fmt(fmin,'Hz')} ; fmax = {fmt(fmax,'Hz')} ; Δf = {fmt((fmax-fmin)/2,'Hz')}", INFO)
+    r.doute("Valeur de C1 : 0,1 µF lu, mais 11 kHz mesurés", REDUIT,
+            f"Deux simulateurs (Python et ngspice) donnent {fmt(f1,'Hz')} avec 0,1 µF et {fmt(f47,'Hz')} avec 47 nF. "
+            "Avec R1 = R2 = 1,5 kΩ, le condensateur réel est donc ≈ 47 nF (ou les résistances sont plus petites). "
+            "Seule une photo nette du montage peut trancher entre les deux.")
+    r.doute("« La diode rend charge et décharge égales »", LEVE,
+            f"Faux avec R3 = 10 kΩ sur la broche 5 : rapport cyclique ≈ {fr(100*d1)} % (seuils 2,5 V et 1,25 V).")
+    r.doute("Amplitude de sortie 5,4 V sous 5 V", REDUIT,
+            f"Impossible pour un NE555 bipolaire (≈ {fmt(vh,'V')}) : 555 CMOS, sonde mal compensée ou lecture "
+            "crête-à-crête avec dépassement.")
+
+    fig, ax = nouvelle_figure(1, 3, "TP10 – ngspice : NE555 en astable (C1 = 0,1 µF, sans message)")
+    k = (t > 1e-3) & (t < 1.6e-3)
+    ax[0].plot((t[k] - 1e-3) * 1e6, vc[k], lw=1, label="tension de C1")
+    ax[0].plot((t[k] - 1e-3) * 1e6, vo[k], lw=0.8, label="sortie (broche 3)")
+    ax[0].set_xlabel("t (µs)"); ax[0].legend(fontsize=7, loc="upper right")
+    sauve(fig, r, outdir, "tp10_555_ngspice.png", "Simulation ngspice du 555 avec les valeurs du schéma")

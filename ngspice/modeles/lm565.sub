@@ -1,0 +1,33 @@
+* LM565 : modèle comportemental construit d'après la fiche technique (National Semiconductor)
+* - VCO : la broche 8 est maintenue 0,6 V sous +V ; I1 = 0,6 V / R1 charge et décharge C1 (broche 9)
+*         entre deux seuils distants de 1 V  ->  f0 = I1/(2·C1·1 V) = 1,2/(4·R1·C1)
+* - sensibilité du VCO : Ko = 50·f0/Vc rad/s/V (Vc = tension totale d'alimentation)
+* - comparateur de phase : multiplieur de signaux limités, sortie ±1 V, résistance interne 3,6 kΩ (broche 7)
+*   -> plage de verrouillage ±Ko·1 V = ±8·f0/Vc (fiche technique)
+* - broche 6 : référence à mi-alimentation
+* Ordre des broches : 1 −V, 2 ENTRÉE, 3 ENTRÉE, 4 SORTIE VCO, 5 ENTRÉE VCO DU COMPARATEUR, 6 RÉFÉRENCE,
+*                     7 SORTIE DÉMODULÉE, 8 R1, 9 C1, 10 +V
+.subckt LM565 vm in1 in2 vcoout pdin ref out tr tc vp
+Rin1 in1 vm 10MEG
+Rin2 in2 vm 10MEG
+Rpd pdin vm 10MEG
+* référence (broche 6)
+Bref r6 vm V = 0.5*v(vp,vm)
+R6 r6 ref 100
+* comparateur de phase et résistance interne
+Bpd pdo vm V = v(ref,vm) + tanh(v(in1,in2)/0.01)*tanh(v(pdin,ref)/0.01)
+R7 pdo out 3.6k
+* VCO : broche 8 à +V − 0,6 V
+B8 n8 vm V = v(vp,vm) - 0.6
+V8s tr n8 0
+* seuils de C1 : référence ± 0,5 V
+Bhi rr vm V = 0.5*(1+tanh((v(tc,ref) - 0.5)/0.005))
+Blo s vm V = 0.5*(1+tanh((-0.5 - v(tc,ref))/0.005))
+Bq qi vm V = v(s,vm) + (1 - v(s,vm))*(1 - v(rr,vm))*v(qm,vm)
+Rq qi qm 1k
+Cq qm vm 1p
+Bc vm tc I = (2*v(qm,vm) - 1)*i(V8s)*max(0.02, 1 + 50/(6.2832*v(vp,vm))*v(out,ref))
+* sortie du VCO (broche 4) : carré ±1 V autour de la référence
+Bv4 v4 vm V = v(ref,vm) + 2*v(qm,vm) - 1
+R4 v4 vcoout 100
+.ends LM565

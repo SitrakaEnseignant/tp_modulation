@@ -1,7 +1,8 @@
 """TP01 – Modulation d'amplitude, maquette Omega ETB-96 (Dr. Lalchand Patle)."""
 import numpy as np
 
-from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, fmt, fr, ecart_pct,
+import ngspice_outil as ng
+from common import (Resultat, CONFIRME, ECART, INDETERMINE, INFO, LEVE, REDUIT, RESTE, fmt, fr, ecart_pct,
                     freq_moyenne, cretes_par_cycle, spectre, detecteur_enveloppe, passe_bas,
                     sinad_db, nouvelle_figure, sauve)
 
@@ -86,6 +87,7 @@ def run(outdir):
     fm_ok = np.sqrt(1 - m**2) / (m * 2 * np.pi * tau)
     r.check("Fréquence maximale du message pour ce détecteur", "—", fmt(fm_ok, "Hz"), INFO,
             "au-delà, l'écrêtage en diagonale apparaît (m = 0,714, RC = 100 µs)")
+    _ngspice(r, m, outdir)
     r.hypotheses += [
         "Signal AM idéal : la non-linéarité des transistors BF-195 n'est pas modélisée.",
         "Diode OA-79 (germanium) modélisée par un seuil de 0,2 V et 300 Ω en série.",
@@ -109,3 +111,35 @@ def run(outdir):
     ax[2].set_title("Démodulation : écrêtage en diagonale avec RC = 100 µs", fontsize=9)
     sauve(fig, r, outdir, "tp01_am.png", "Signal AM, spectre et détecteur d'enveloppe simulés")
     return r
+
+
+def _ngspice(r, m, outdir):
+    if not ng.disponible():
+        r.check("[ngspice] Détecteur OA-79", "—", "ngspice absent sur cette machine", INDETERMINE,
+                "la simulation tourne dans GitHub Actions")
+        return
+    res = {}
+    for fm, c, tstop in ((10e3, "0.01u", "1m"), (1e3, "0.01u", "4m"), (10e3, "1.5n", "1m")):
+        t, (am, out) = ng.lance("tp01_detecteur_oa79.cir", pas=0.02e-6, FMSG=f"{fm:g}", CDET=c, TSTOP=tstop)
+        fs = 1 / (t[1] - t[0])
+        sel = t > t[-1] - 3 / fm
+        vf = passe_bas(out, fs, 3 * fm, 4)
+        res[(fm, c)] = (sinad_db(vf[sel], t[sel], fm), t, am, out)
+    s10, s1, s15 = res[(10e3, "0.01u")][0], res[(1e3, "0.01u")][0], res[(10e3, "1.5n")][0]
+    r.check("[ngspice] Détecteur de la maquette (OA-79, 10 kΩ, 0,01 µF), message 10 kHz", "message montré déformé ?",
+            f"SINAD {fr(s10)} dB", ECART if s10 < 20 else CONFIRME,
+            "même conclusion que le modèle Python : écrêtage en diagonale à 10 kHz")
+    r.check("[ngspice] Même détecteur, message 1 kHz", "—", f"SINAD {fr(s1)} dB", INFO)
+    r.check("[ngspice] Détecteur avec 1,5 nF, message 10 kHz", "—", f"SINAD {fr(s15)} dB", INFO)
+    r.doute("Le détecteur de la maquette restitue-t-il le message de 10 kHz utilisé dans la vidéo ?", LEVE,
+            f"Non : ngspice (diode germanium SPICE) donne un SINAD de {fr(s10)} dB à 10 kHz contre {fr(s1)} dB à 1 kHz. "
+            "La constante de temps 10 kΩ × 0,01 µF = 100 µs est faite pour un message audio de 1 à 2 kHz.")
+    r.doute("Circuit interne de l'oscillateur de porteuse (≈ 133 kHz)", RESTE,
+            "Il n'est pas imprimé sur la maquette : la porteuse est mesurée, pas simulée.")
+    _, t, am, out = res[(10e3, "0.01u")]
+    fig, ax = nouvelle_figure(1, 3, "TP01 – ngspice : détecteur OA-79, 10 kΩ // 0,01 µF, message 10 kHz")
+    k = t > 0.6e-3
+    ax[0].plot((t[k] - 0.6e-3) * 1e6, am[k], lw=0.3, c="0.7", label="signal AM")
+    ax[0].plot((t[k] - 0.6e-3) * 1e6, out[k], lw=1.3, label="sortie du détecteur")
+    ax[0].set_xlabel("t (µs)"); ax[0].legend(fontsize=7, loc="upper right")
+    sauve(fig, r, outdir, "tp01_detecteur_ngspice.png", "Écrêtage en diagonale simulé dans ngspice")

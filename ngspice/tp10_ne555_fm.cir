@@ -1,0 +1,29 @@
+* TP10 - Modulateur FM a NE555 (valeurs du schema de la video)
+* Astable : R1 = R2 = 1,5 kohm, diode 1N4007 en parallele sur R2, C1 = 0,1 uF
+* Broche 5 : R3 = 10 kohm vers la masse, message 200 Hz par C2 = 10 uF
+* Les lignes .param peuvent etre modifiees par python/ngspice_outil.py
+.include modeles/composants.lib
+.include modeles/ne555.sub
+.param C1VAL=0.1u
+.param AMSG=0
+.param TSTOP=3m
+.param CVINIT=2.5
+VCC vcc 0 DC 5
+*  GND TRIG OUT RESET CV THR DIS VCC
+X1 0 n2 out vcc cv n2 dis vcc NE555
+R1 vcc dis 1.5k
+R2 dis n2 1.5k
+D1 dis n2 D1N4007
+C1 n2 0 {C1VAL}
+R3 cv 0 10k
+C2 cv msg 10u
+VMSG msg 0 SIN(0 {AMSG} 200)
+.ic v(cv)={CVINIT} v(n2)=0
+.options method=gear reltol=1e-4
+.tran 0.1u {TSTOP} 0 0.1u uic
+.control
+run
+wrdata sortie.txt v(out) v(n2) v(cv)
+quit
+.endc
+.end

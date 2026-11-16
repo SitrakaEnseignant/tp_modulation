@@ -1,0 +1,19 @@
+* TP01 - Detecteur d'enveloppe de la maquette Omega ETB-96 : diode OA-79, 10 kohm // 0,01 uF
+* Entree : signal AM mesure dans la video (porteuse 133,3 kHz, Vmax = 4,8 V, Vmin = 0,8 V, m = 0,714)
+.include modeles/composants.lib
+.param FMSG=10k
+.param CDET=0.01u
+.param TSTOP=1m
+BAM am 0 V = 2.8*(1 + 0.714*cos(2*3.14159265*{FMSG}*time))*cos(2*3.14159265*133333.33*time)
+RS am a 100
+D1 a out OA79
+R1 out 0 10k
+C1 out 0 {CDET}
+.options reltol=1e-4
+.tran 0.02u {TSTOP} 0 0.02u
+.control
+run
+wrdata sortie.txt v(am) v(out)
+quit
+.endc
+.end
